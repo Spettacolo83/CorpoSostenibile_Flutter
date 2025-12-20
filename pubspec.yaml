@@ -1,0 +1,69 @@
+name: corpo_sostenibile
+description: "App mobile per Corpo Sostenibile - Centro Online di Nutrizione Integrativa"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI e icone
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.2.1
+  flutter_svg: ^2.0.10+1
+  cached_network_image: ^3.4.1
+  shimmer: ^3.0.0
+
+  # State Management (Riverpod)
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # Navigazione
+  go_router: ^14.6.2
+
+  # Network e API
+  dio: ^5.7.0
+  retrofit: ^4.4.1
+
+  # Storage sicuro (per JWT/OAuth tokens)
+  flutter_secure_storage: ^9.2.2
+  shared_preferences: ^2.3.3
+
+  # Utility
+  equatable: ^2.0.7
+  dartz: ^0.10.1
+  intl: ^0.20.1
+  logger: ^2.5.0
+
+  # Annotazioni per code generation
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Linting
+  flutter_lints: ^5.0.0
+
+  # Code generation
+  build_runner: ^2.4.13
+  freezed: ^2.5.7
+  json_serializable: ^6.8.0
+  riverpod_generator: ^2.6.3
+  retrofit_generator: ^9.1.5
+
+  # Testing
+  mocktail: ^1.0.4
+  network_image_mock: ^2.1.1
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/fonts/
