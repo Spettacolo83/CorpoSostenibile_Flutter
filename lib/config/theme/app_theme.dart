@@ -35,6 +35,7 @@ class AppTheme {
       inputDecorationTheme: _buildInputDecorationTheme(Brightness.light),
       cardTheme: _buildCardTheme(),
       bottomNavigationBarTheme: _buildBottomNavTheme(Brightness.light),
+      navigationBarTheme: _buildNavigationBarTheme(Brightness.light),
       dividerTheme: const DividerThemeData(color: AppColors.divider),
     );
   }
@@ -66,7 +67,42 @@ class AppTheme {
       inputDecorationTheme: _buildInputDecorationTheme(Brightness.dark),
       cardTheme: _buildCardTheme(),
       bottomNavigationBarTheme: _buildBottomNavTheme(Brightness.dark),
+      navigationBarTheme: _buildNavigationBarTheme(Brightness.dark),
       dividerTheme: const DividerThemeData(color: AppColors.divider),
+    );
+  }
+
+  static NavigationBarThemeData _buildNavigationBarTheme(Brightness brightness) {
+    final isDark = brightness == Brightness.dark;
+    return NavigationBarThemeData(
+      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+      indicatorColor: isDark
+          ? AppColors.warning.withValues(alpha: 0.3)
+          : AppColors.primary.withValues(alpha: 0.2),
+      iconTheme: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return IconThemeData(
+            color: isDark ? AppColors.warning : AppColors.primary,
+          );
+        }
+        return IconThemeData(
+          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+        );
+      }),
+      labelTextStyle: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return GoogleFonts.poppins(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: isDark ? AppColors.warning : AppColors.primary,
+          );
+        }
+        return GoogleFonts.poppins(
+          fontSize: 12,
+          fontWeight: FontWeight.normal,
+          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+        );
+      }),
     );
   }
 
@@ -238,8 +274,12 @@ class AppTheme {
       backgroundColor: brightness == Brightness.light
           ? AppColors.surface
           : AppColors.surfaceDark,
-      selectedItemColor: AppColors.primary,
-      unselectedItemColor: AppColors.textSecondary,
+      selectedItemColor: brightness == Brightness.light
+          ? AppColors.primary
+          : AppColors.warning,
+      unselectedItemColor: brightness == Brightness.light
+          ? AppColors.textSecondary
+          : AppColors.textSecondaryDark,
       selectedLabelStyle: GoogleFonts.poppins(
         fontSize: 12,
         fontWeight: FontWeight.w500,

@@ -1,16 +1,173 @@
-# Corpo Sostenibile - App Mobile
+<p align="center">
+  <img src="docs/screenshots/logo.svg" alt="Corpo Sostenibile Logo" width="120"/>
+</p>
 
-App mobile per **Corpo Sostenibile**, il #1 Centro Online di Nutrizione Integrativa.
+<h1 align="center">Corpo Sostenibile</h1>
+
+<p align="center">
+  <strong>App Mobile per il Centro Online di Nutrizione Integrativa</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Flutter-3.29+-02569B?logo=flutter&logoColor=white" alt="Flutter"/>
+  <img src="https://img.shields.io/badge/Dart-3.7+-0175C2?logo=dart&logoColor=white" alt="Dart"/>
+  <img src="https://img.shields.io/badge/Platform-iOS%20%7C%20Android-lightgrey" alt="Platform"/>
+  <img src="https://img.shields.io/badge/License-Proprietary-red" alt="License"/>
+</p>
+
+---
 
 ## Descrizione
 
-Applicazione Flutter cross-platform (iOS/Android) per la gestione del percorso di benessere e nutrizione degli utenti. L'app consente di:
+Applicazione Flutter cross-platform (iOS/Android) per la gestione del percorso di benessere e nutrizione degli utenti di **Corpo Sostenibile**, il #1 Centro Online di Nutrizione Integrativa.
 
-- Gestire appuntamenti con i professionisti
-- Visualizzare e seguire il piano alimentare personalizzato
-- Tracciare i progressi del percorso
-- Comunicare con il team di supporto
-- Accedere a risorse educative
+### Funzionalità Principali
+
+- **Dashboard Interattiva** - Panoramica completa del percorso di benessere
+- **Piano Alimentare** - Visualizzazione e tracking del piano personalizzato
+- **Tracciamento Progressi** - Grafici e statistiche settimanali
+- **Chat con Professionisti** - Comunicazione diretta con nutrizionisti e coach
+- **Assistente AI Integrato** - Chatbot intelligente per supporto immediato
+- **Profilo Utente** - Gestione dati personali e preferenze
+- **Tema Chiaro/Scuro** - Supporto completo per entrambe le modalità
+
+---
+
+## Screenshots
+
+L'app supporta sia **Light Mode** che **Dark Mode**. Di seguito alcuni screenshot dalle versioni Android e iOS.
+
+### Android
+
+<p align="center">
+  <img src="docs/screenshots/android_home.png" width="180" alt="Home Android"/>
+  <img src="docs/screenshots/android_progresso.png" width="180" alt="Progresso Android"/>
+  <img src="docs/screenshots/android_chat.png" width="180" alt="Chat Android"/>
+  <img src="docs/screenshots/android_team.png" width="180" alt="Team Android"/>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/android_profilo.png" width="180" alt="Profilo Android"/>
+  <img src="docs/screenshots/android_chatbotia.png" width="180" alt="Chatbot AI Android"/>
+</p>
+
+### iOS
+
+<p align="center">
+  <img src="docs/screenshots/ios_home.png" width="180" alt="Home iOS"/>
+  <img src="docs/screenshots/ios_progresso.png" width="180" alt="Progresso iOS"/>
+  <img src="docs/screenshots/ios_chat.png" width="180" alt="Chat iOS"/>
+  <img src="docs/screenshots/ios_team.png" width="180" alt="Team iOS"/>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/ios_profilo.png" width="180" alt="Profilo iOS"/>
+  <img src="docs/screenshots/ios_chatbotia.png" width="180" alt="Chatbot AI iOS"/>
+</p>
+
+---
+
+## Assistente AI - Integrazione Gemini
+
+L'app include un **Assistente AI completamente funzionante** basato su Google Gemini. L'assistente è in grado di:
+
+- Rispondere a domande su nutrizione e benessere
+- Fornire consigli personalizzati utilizzando il nome dell'utente
+- Supportare la formattazione Markdown (**grassetto**, *corsivo*, liste)
+- Mantenere il contesto della conversazione durante la sessione
+
+### Configurazione
+
+Il servizio AI è configurato nel file `lib/core/services/gemini_service.dart`:
+
+```dart
+/// API Key per Google AI Studio (Gemini)
+/// Ottieni la tua API key da: https://aistudio.google.com/apikey
+static const apiKey = 'YOUR_API_KEY_HERE';
+
+/// Nome del modello Gemini da utilizzare
+static const modelName = 'gemini-flash-latest';
+
+/// System Prompt per l'assistente AI
+static const systemPrompt = '''
+Sei l'assistente AI di Corpo Sostenibile...
+''';
+```
+
+### Come Ottenere una API Key Gratuita
+
+1. Vai su [Google AI Studio](https://aistudio.google.com/apikey)
+2. Accedi con il tuo account Google
+3. Clicca su "Create API Key"
+4. Copia la chiave e inseriscila in `gemini_service.dart`
+
+> **Nota**: La API key gratuita ha dei limiti di utilizzo (richieste al minuto/giorno). Per uso in produzione, considera un piano a pagamento.
+
+### Personalizzazione del Prompt
+
+Il `systemPrompt` definisce il comportamento dell'assistente. Puoi personalizzarlo per:
+
+- Cambiare il tono delle risposte
+- Aggiungere/rimuovere argomenti trattabili
+- Modificare i riferimenti ai professionisti del team
+- Adattare le linee guida al tuo caso d'uso
+
+### Modelli Disponibili
+
+| Modello | Descrizione |
+|---------|-------------|
+| `gemini-flash-latest` | Veloce e leggero (consigliato) |
+| `gemini-pro` | Più potente, risposte elaborate |
+| `gemini-2.0-flash` | Ultima versione Flash |
+
+---
+
+## Design del Logo e Animazione
+
+### Ricostruzione Logo da PNG a SVG
+
+Il logo originale era disponibile solo in formato PNG. È stato **ricostruito manualmente in formato SVG** per garantire:
+
+- Scalabilità perfetta su tutti i dispositivi
+- Dimensioni file ridotte
+- Possibilità di animazione
+- Nitidezza su schermi Retina/HiDPI
+
+<p align="center">
+  <img src="docs/screenshots/logo.png" width="400" alt="Logo Reconstruction Process"/>
+</p>
+
+Il processo ha richiesto:
+1. Analisi delle forme geometriche del logo originale
+2. Ricostruzione dei path vettoriali
+3. Ottimizzazione dei tracciati per dimensioni minime
+4. Test su diverse risoluzioni e dimensioni
+
+### Animazione Splash Screen
+
+L'animazione della splash screen è stata progettata utilizzando **Rive** come strumento di prototipazione per definire:
+
+- Timing e easing delle transizioni
+- Sequenza di apparizione degli elementi
+- Effetto di "crescita" organica del logo
+
+<p align="center">
+  <img src="docs/screenshots/animazione.png" width="500" alt="Animation Design in Rive"/>
+</p>
+
+Successivamente, l'animazione è stata **reimplementata nativamente in Flutter** utilizzando:
+
+- `AnimationController` per il controllo del timing
+- `TweenSequence` per transizioni fluide
+- `CustomPainter` per il rendering ottimizzato
+- Curves personalizzate per un effetto naturale
+
+Questo approccio garantisce:
+- Performance ottimali (no dipendenze esterne runtime)
+- Controllo completo sull'animazione
+- Dimensioni bundle ridotte
+
+---
 
 ## Architettura
 
@@ -31,31 +188,23 @@ lib/
 │
 ├── core/                      # Elementi condivisi
 │   ├── constants/            # Costanti globali
-│   ├── errors/               # Gestione errori (Failures/Exceptions)
+│   ├── errors/               # Gestione errori
 │   ├── network/              # Client API (Dio)
+│   ├── services/             # Servizi (Gemini AI)
 │   ├── utils/                # Utility functions
 │   └── widgets/              # Widget riutilizzabili
 │
 ├── features/                  # Feature dell'app (per modulo)
 │   ├── auth/                 # Autenticazione
-│   │   ├── data/            # Layer dati
-│   │   │   ├── datasources/ # API e cache
-│   │   │   ├── models/      # Data models (JSON)
-│   │   │   └── repositories/# Implementazioni repository
-│   │   ├── domain/          # Layer business logic
-│   │   │   ├── entities/    # Entità di dominio
-│   │   │   ├── repositories/# Interfacce repository
-│   │   │   └── usecases/    # Casi d'uso
-│   │   └── presentation/    # Layer UI
-│   │       ├── pages/       # Schermate
-│   │       ├── widgets/     # Widget specifici
-│   │       └── providers/   # State (Riverpod)
-│   │
-│   └── home/                 # Home/Dashboard
-│       └── ...              # Stessa struttura
+│   ├── home/                 # Home/Dashboard + AI Chat
+│   ├── progress/             # Tracciamento progressi
+│   ├── chat/                 # Chat con professionisti
+│   └── professionals/        # Team e appuntamenti
 │
 └── main.dart                  # Entry point
 ```
+
+---
 
 ## Stack Tecnologico
 
@@ -65,16 +214,23 @@ lib/
 | **State Management** | Riverpod 2.x |
 | **Routing** | go_router |
 | **HTTP Client** | Dio + Retrofit |
+| **AI Integration** | Google Generative AI (Gemini) |
 | **Storage Sicuro** | flutter_secure_storage |
 | **Serializzazione** | freezed + json_serializable |
+| **UI Components** | Material 3 + Custom Widgets |
 | **Testing** | mocktail |
+
+---
 
 ## Requisiti
 
 - Flutter SDK >= 3.7.2
 - Dart SDK >= 3.7.2
-- Xcode (per iOS)
+- Xcode 15+ (per iOS)
 - Android Studio (per Android)
+- API Key Google AI Studio (per Assistente AI)
+
+---
 
 ## Installazione
 
@@ -89,22 +245,23 @@ lib/
    flutter pub get
    ```
 
-3. **Genera il codice (models, providers)**
+3. **Configura la API Key Gemini**
+   ```bash
+   # Modifica lib/core/services/gemini_service.dart
+   # Inserisci la tua API key
+   ```
+
+4. **Genera il codice (models, providers)**
    ```bash
    flutter pub run build_runner build --delete-conflicting-outputs
    ```
 
-4. **Esegui l'app**
+5. **Esegui l'app**
    ```bash
-   # Debug
    flutter run
-
-   # iOS Simulator
-   flutter run -d ios
-
-   # Android Emulator
-   flutter run -d android
    ```
+
+---
 
 ## Comandi Utili
 
@@ -114,9 +271,6 @@ flutter analyze
 
 # Esegui test
 flutter test
-
-# Esegui test con coverage
-flutter test --coverage
 
 # Build release Android
 flutter build apk --release
@@ -128,60 +282,68 @@ flutter build ios --release
 flutter pub run build_runner watch
 ```
 
+---
+
 ## Design System
 
-L'app utilizza un design system coerente basato su Material 3:
+L'app utilizza un design system coerente basato su **Material 3**:
 
-### Colori Principali
-- **Primary**: Verde (#2E7D32) - Natura e salute
-- **Secondary**: Arancione (#FF8F00) - Energia e vitalità
-- **Accent**: Teal (#00897B) - Equilibrio
+### Palette Colori
+
+| Colore | Hex | Utilizzo |
+|--------|-----|----------|
+| **Primary** | `#143029` | Brand principale, elementi chiave |
+| **Primary Light** | `#2E7D32` | Accenti, stati hover |
+| **Secondary** | `#FF8F00` | Call-to-action, notifiche |
+| **Success** | `#4CAF50` | Conferme, progressi positivi |
+| **Warning** | `#FFC107` | Avvisi, attenzione |
 
 ### Tipografia
-- Font: **Poppins** (Google Fonts)
+
+- **Font principale**: Poppins (Google Fonts)
+- **Font secondario**: Quicksand
 - Supporto completo per tema chiaro/scuro
-
-## Testing
-
-Il progetto include test per ogni layer:
-
-```
-test/
-├── core/                # Test utilities core
-├── features/
-│   ├── auth/
-│   │   ├── data/       # Test datasources e repositories
-│   │   ├── domain/     # Test usecases
-│   │   └── presentation/ # Widget test
-│   └── home/
-└── helpers/            # Test utilities
-```
-
-## Convenzioni di Codice
-
-- **Lingua codice**: Inglese
-- **Documentazione**: Italiano
-- **Naming**: camelCase per variabili, PascalCase per classi
-- **File**: snake_case
-- **Lint**: seguire le regole di `flutter_lints`
-
-## Roadmap
-
-- [x] Setup progetto e architettura
-- [x] Configurazione tema e design system
-- [x] Pagina splash e login
-- [x] Home page con dashboard
-- [ ] Autenticazione JWT/OAuth2
-- [ ] Integrazione API REST (Flask)
-- [ ] Profilo utente
-- [ ] Piano alimentare
-- [ ] Sistema notifiche
-- [ ] Chat con supporto
-
-## Autore
-
-Sviluppato per **Corpo Sostenibile** - Centro Online di Nutrizione Integrativa
 
 ---
 
-*Mockup realizzato per dimostrazione competenze Flutter Developer*
+## Roadmap
+
+- [x] Setup progetto e architettura Clean
+- [x] Configurazione tema e design system (Light/Dark)
+- [x] Splash screen con animazione logo
+- [x] Sistema di autenticazione (UI)
+- [x] Home page con dashboard interattiva
+- [x] Sezione Progressi con grafici
+- [x] Chat con professionisti
+- [x] Pagina Team con profili
+- [x] Profilo utente
+- [x] **Assistente AI con Gemini** (funzionante)
+- [ ] Autenticazione backend JWT/OAuth2
+- [ ] Integrazione API REST
+- [ ] Sistema notifiche push
+- [ ] Calendario appuntamenti
+
+---
+
+## Autore
+
+Sviluppato da **Stefano Russello** come demo di competenze Flutter Developer.
+
+### Competenze Dimostrate
+
+- **Flutter/Dart** - Sviluppo cross-platform avanzato
+- **Clean Architecture** - Strutturazione scalabile del codice
+- **State Management** - Riverpod per gestione stato reattiva
+- **AI Integration** - Integrazione API Google Gemini
+- **UI/UX Design** - Design system coerente, supporto dark mode
+- **Graphic Design** - Ricostruzione logo PNG→SVG, animazioni custom
+
+---
+
+<p align="center">
+  <i>Mockup realizzato per dimostrazione competenze Flutter Developer</i>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/logo.svg" alt="Corpo Sostenibile" width="60"/>
+</p>

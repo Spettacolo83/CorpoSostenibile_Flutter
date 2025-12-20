@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../config/routes/app_router.dart';
 import '../../../../config/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../providers/auth_provider.dart';
 
 /// Pagina di login dell'applicazione.
 /// Gestisce l'autenticazione con email/password e OAuth.
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -29,6 +31,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _handleLogin() async {
+    // Nasconde la tastiera
+    FocusScope.of(context).unfocus();
+
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
@@ -38,6 +43,10 @@ class _LoginPageState extends State<LoginPage> {
 
     if (!mounted) return;
 
+    // Salva l'email nel provider (persistente)
+    await ref.read(authProvider.notifier).login(_emailController.text.trim());
+
+    if (!mounted) return;
     setState(() => _isLoading = false);
     context.go(AppRoutes.home);
   }
@@ -75,18 +84,11 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildHeader() {
     return Column(
       children: [
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: const Icon(
-            Icons.eco,
-            size: 40,
-            color: AppColors.primary,
-          ),
+        // Logo app
+        Image.asset(
+          'assets/icons/app_icon_foreground.png',
+          width: 200,
+          height: 200,
         ),
         const SizedBox(height: 24),
         Text(
@@ -113,6 +115,9 @@ class _LoginPageState extends State<LoginPage> {
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
+            autocorrect: false,
+            enableSuggestions: false,
+            textCapitalization: TextCapitalization.none,
             decoration: const InputDecoration(
               labelText: 'Email',
               hintText: 'inserisci la tua email',
