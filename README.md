@@ -222,6 +222,52 @@ lib/
 
 ---
 
+## Download e Installazione App
+
+Nella cartella `releases/` sono disponibili i file di installazione precompilati:
+
+| Piattaforma | File | Dimensione |
+|-------------|------|------------|
+| **Android** | `CorpoSostenibile.apk` | ~24 MB |
+| **iOS** | `CorpoSostenibile.ipa` | ~24 MB |
+
+### Installazione Android (APK)
+
+1. **Scarica** il file `CorpoSostenibile.apk` dalla cartella `releases/`
+2. **Trasferisci** il file sul tuo dispositivo Android (via USB, email, cloud, ecc.)
+3. **Abilita** l'installazione da origini sconosciute:
+   - Vai in *Impostazioni > Sicurezza > Origini sconosciute* (o *Installa app sconosciute*)
+   - Abilita per il file manager o browser che userai
+4. **Apri** il file APK e segui le istruzioni di installazione
+5. **Avvia** l'app "Corpo Sostenibile"
+
+### Installazione iOS (IPA)
+
+L'IPA non è firmato con un certificato Apple. Per installarlo hai diverse opzioni:
+
+#### Opzione 1: AltStore (Consigliata)
+1. Installa [AltStore](https://altstore.io/) sul tuo Mac/PC
+2. Collega il tuo iPhone via USB
+3. Usa AltStore per installare il file `.ipa`
+4. L'app sarà valida per 7 giorni, poi dovrai reinstallarla
+
+#### Opzione 2: Sideloadly
+1. Scarica [Sideloadly](https://sideloadly.io/)
+2. Collega iPhone via USB
+3. Trascina il file `.ipa` in Sideloadly
+4. Inserisci il tuo Apple ID
+5. Installa
+
+#### Opzione 3: Xcode (per sviluppatori)
+1. Apri il progetto in Xcode
+2. Collega il dispositivo
+3. Seleziona il tuo team di sviluppo
+4. Esegui `flutter run --release`
+
+> **Nota**: Per iOS, l'app installata tramite sideloading richiede che il dispositivo sia in *Modalità Sviluppatore* (iOS 16+) e che l'app sia "fidata" in *Impostazioni > Generali > Gestione dispositivo*.
+
+---
+
 ## Requisiti
 
 - Flutter SDK >= 3.7.2
