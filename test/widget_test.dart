@@ -1,30 +1,25 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:corpo_sostenibile/main.dart';
+import 'package:corpo_sostenibile/core/constants/app_constants.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('App si avvia correttamente', (WidgetTester tester) async {
+    // Costruisce l'app con ProviderScope per Riverpod
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: CorpoSostenibileApp(),
+      ),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Verifica che il widget principale sia presente
+    expect(find.byType(CorpoSostenibileApp), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // Verifica che lo splash screen mostri il nome dell'app
+    expect(find.text(AppConstants.appName), findsOneWidget);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Avanza il timer dello splash per completare la navigazione
+    await tester.pumpAndSettle(const Duration(seconds: 3));
   });
 }

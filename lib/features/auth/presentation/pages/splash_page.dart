@@ -82,7 +82,7 @@ class _SplashPageState extends State<SplashPage>
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -106,7 +106,7 @@ class _SplashPageState extends State<SplashPage>
                 Text(
                   'Nutrizione Integrativa',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppColors.textOnPrimary.withOpacity(0.8),
+                        color: AppColors.textOnPrimary.withValues(alpha: 0.8),
                       ),
                 ),
               ],

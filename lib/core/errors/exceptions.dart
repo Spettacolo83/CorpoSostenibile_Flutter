@@ -1,4 +1,5 @@
 /// Eccezioni personalizzate per la gestione degli errori
+library;
 
 /// Eccezione per errori del server
 class ServerException implements Exception {
