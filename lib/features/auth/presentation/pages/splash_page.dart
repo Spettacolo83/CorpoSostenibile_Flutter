@@ -64,7 +64,7 @@ class _SplashPageState extends State<SplashPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primary,
+      backgroundColor: AppColors.primaryDark,
       body: Center(
         child: FadeTransition(
           opacity: _fadeAnimation,
@@ -73,32 +73,40 @@ class _SplashPageState extends State<SplashPage>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Logo placeholder
+                // Logo placeholder - sarà sostituito con l'immagine reale
                 Container(
-                  width: 120,
-                  height: 120,
+                  width: 140,
+                  height: 140,
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(24),
+                    gradient: const LinearGradient(
+                      colors: [
+                        AppColors.primaryLight,
+                        AppColors.primaryMedium,
+                        AppColors.primary,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(28),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
+                        color: AppColors.primary.withValues(alpha: 0.4),
+                        blurRadius: 24,
+                        offset: const Offset(0, 12),
                       ),
                     ],
                   ),
                   child: const Icon(
                     Icons.eco,
-                    size: 64,
-                    color: AppColors.primary,
+                    size: 72,
+                    color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
                 Text(
                   AppConstants.appName,
                   style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                        color: AppColors.textOnPrimary,
+                        color: AppColors.primaryLight,
                         fontWeight: FontWeight.bold,
                       ),
                 ),
@@ -106,7 +114,7 @@ class _SplashPageState extends State<SplashPage>
                 Text(
                   'Nutrizione Integrativa',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppColors.textOnPrimary.withValues(alpha: 0.8),
+                        color: AppColors.primaryMedium,
                       ),
                 ),
               ],

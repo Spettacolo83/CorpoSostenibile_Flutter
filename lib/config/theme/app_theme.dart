@@ -188,7 +188,7 @@ class AppTheme {
   static InputDecorationTheme _buildInputDecorationTheme(Brightness brightness) {
     final fillColor = brightness == Brightness.light
         ? AppColors.surfaceVariant
-        : AppColors.surfaceDark;
+        : AppColors.surfaceVariantDark;
 
     return InputDecorationTheme(
       filled: true,
