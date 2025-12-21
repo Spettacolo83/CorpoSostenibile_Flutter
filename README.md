@@ -35,9 +35,9 @@ Applicazione Flutter cross-platform (iOS/Android) per la gestione del percorso d
 
 ## Screenshots
 
-L'app supporta sia **Light Mode** che **Dark Mode**. Di seguito alcuni screenshot dalle versioni Android e iOS.
+L'app supporta sia **Light Mode** che **Dark Mode**. Di seguito alcuni screenshot dalle versioni Android (Dark Mode) e iOS (Light Mode).
 
-### Android
+### Android (Dark Mode)
 
 <p align="center">
   <img src="docs/screenshots/android_home.png" width="180" alt="Home Android"/>
@@ -51,7 +51,7 @@ L'app supporta sia **Light Mode** che **Dark Mode**. Di seguito alcuni screensho
   <img src="docs/screenshots/android_chatbotia.png" width="180" alt="Chatbot AI Android"/>
 </p>
 
-### iOS
+### iOS (Light Mode)
 
 <p align="center">
   <img src="docs/screenshots/ios_home.png" width="180" alt="Home iOS"/>
@@ -78,30 +78,31 @@ L'app include un **Assistente AI completamente funzionante** basato su Google Ge
 
 ### Configurazione
 
-Il servizio AI è configurato nel file `lib/core/services/gemini_service.dart`:
-
-```dart
-/// API Key per Google AI Studio (Gemini)
-/// Ottieni la tua API key da: https://aistudio.google.com/apikey
-static const apiKey = 'YOUR_API_KEY_HERE';
-
-/// Nome del modello Gemini da utilizzare
-static const modelName = 'gemini-flash-latest';
-
-/// System Prompt per l'assistente AI
-static const systemPrompt = '''
-Sei l'assistente AI di Corpo Sostenibile...
-''';
-```
+L'API key **non è inclusa nel codice sorgente** per motivi di sicurezza. Viene passata durante la build tramite `--dart-define`.
 
 ### Come Ottenere una API Key Gratuita
 
 1. Vai su [Google AI Studio](https://aistudio.google.com/apikey)
 2. Accedi con il tuo account Google
 3. Clicca su "Create API Key"
-4. Copia la chiave e inseriscila in `gemini_service.dart`
+4. Usa la chiave durante la build (vedi sotto)
 
 > **Nota**: La API key gratuita ha dei limiti di utilizzo (richieste al minuto/giorno). Per uso in produzione, considera un piano a pagamento.
+
+### Build con API Key
+
+```bash
+# Debug
+flutter run --dart-define=GEMINI_API_KEY=your_api_key_here
+
+# Release APK
+flutter build apk --release --dart-define=GEMINI_API_KEY=your_api_key_here
+
+# Release iOS
+flutter build ios --release --dart-define=GEMINI_API_KEY=your_api_key_here
+```
+
+> **Sicurezza**: Non committare mai la API key nel repository. I file APK/IPA nella cartella `releases/` contengono già una API key funzionante.
 
 ### Personalizzazione del Prompt
 
@@ -218,22 +219,108 @@ lib/
 | **Storage Sicuro** | flutter_secure_storage |
 | **Serializzazione** | freezed + json_serializable |
 | **UI Components** | Material 3 + Custom Widgets |
-| **Testing** | mocktail |
+| **Testing** | flutter_test + mocktail |
+
+---
+
+## Testing
+
+Il progetto include una suite di **54 test** che coprono le funzionalità principali:
+
+```bash
+# Esegui tutti i test
+flutter test
+
+# Esegui test con output dettagliato
+flutter test --reporter=expanded
+```
+
+### Struttura Test
+
+```
+test/
+├── core/
+│   └── utils/
+│       └── markdown_parser_test.dart    # 30 test
+│
+├── features/
+│   └── home/
+│       └── presentation/
+│           └── providers/
+│               └── ai_chat_provider_test.dart  # 23 test
+│
+└── widget_test.dart                      # 1 test
+```
+
+### Test Copertura
+
+| Componente | Test | Descrizione |
+|------------|------|-------------|
+| **MarkdownParser** | 30 | Parser markdown per formattazione testo AI |
+| **AIChatNotifier** | 23 | State management chat AI con mock |
+| **Widget App** | 1 | Verifica avvio app |
+
+### MarkdownParser Tests
+
+Test completi per il parser markdown che gestisce le risposte dell'AI:
+
+- **Testo semplice** - Stringhe senza formattazione
+- **Bold** (`**text**`) - Singoli e multipli
+- **Italic** (`*text*`) - Singoli e multipli
+- **Code** (`` `text` ``) - Inline code
+- **Headers** (`#`, `##`, `###`) - Titoli e sottotitoli
+- **Liste** (`* item`) - Bullet points
+- **Citazioni** (`> text`) - Blockquotes
+- **Code blocks** (` ``` `) - Blocchi codice
+- **Pattern rotti** - Gestione asterischi orfani
+- **Casi reali** - Risposte complete da Gemini
+
+### AIChatNotifier Tests
+
+Test con **mock di GeminiService** usando mocktail:
+
+- **Stato iniziale** - Messaggi vuoti, isTyping false
+- **setUserName** - Impostazione e aggiornamento nome
+- **sendMessage** - Invio messaggi, risposte AI, gestione errori
+- **isTyping** - Stato durante richiesta async
+- **resetChat** - Reset conversazione
+- **Timestamp** - Ordine cronologico messaggi
+
+### Esempio Test con Mock
+
+```dart
+class MockGeminiService extends Mock implements GeminiService {}
+
+test('aggiunge risposta AI alla lista', () async {
+  when(() => mockGeminiService.sendMessage(
+    any(),
+    userName: any(named: 'userName'),
+  )).thenAnswer((_) async => 'Ciao! Come posso aiutarti?');
+
+  await notifier.sendMessage('Ciao');
+
+  expect(notifier.state.messages.length, 2);
+  expect(notifier.state.messages[1].text, 'Ciao! Come posso aiutarti?');
+  expect(notifier.state.messages[1].isUser, isFalse);
+});
+```
 
 ---
 
 ## Download e Installazione App
 
-Nella cartella `releases/` sono disponibili i file di installazione precompilati:
+I file di installazione precompilati sono disponibili su richiesta (non inclusi nel repository per motivi di sicurezza API key).
 
 | Piattaforma | File | Dimensione |
 |-------------|------|------------|
 | **Android** | `CorpoSostenibile.apk` | ~24 MB |
 | **iOS** | `CorpoSostenibile.ipa` | ~24 MB |
 
+> **Per ottenere i file**: Contatta l'autore o compila l'app seguendo le istruzioni nella sezione [Installazione](#installazione).
+
 ### Installazione Android (APK)
 
-1. **Scarica** il file `CorpoSostenibile.apk` dalla cartella `releases/`
+1. **Ottieni** il file `CorpoSostenibile.apk` (contatta l'autore o compila l'app)
 2. **Trasferisci** il file sul tuo dispositivo Android (via USB, email, cloud, ecc.)
 3. **Abilita** l'installazione da origini sconosciute:
    - Vai in *Impostazioni > Sicurezza > Origini sconosciute* (o *Installa app sconosciute*)
@@ -364,6 +451,7 @@ L'app utilizza un design system coerente basato su **Material 3**:
 - [x] Pagina Team con profili
 - [x] Profilo utente
 - [x] **Assistente AI con Gemini** (funzionante)
+- [x] **Unit Test** (54 test con mocktail)
 - [ ] Autenticazione backend JWT/OAuth2
 - [ ] Integrazione API REST
 - [ ] Sistema notifiche push
@@ -381,6 +469,7 @@ Sviluppato da **Stefano Russello** come demo di competenze Flutter Developer.
 - **Clean Architecture** - Strutturazione scalabile del codice
 - **State Management** - Riverpod per gestione stato reattiva
 - **AI Integration** - Integrazione API Google Gemini
+- **Testing** - Unit test con mocktail, dependency injection
 - **UI/UX Design** - Design system coerente, supporto dark mode
 - **Graphic Design** - Ricostruzione logo PNG→SVG, animazioni custom
 

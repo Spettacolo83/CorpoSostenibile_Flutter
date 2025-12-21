@@ -40,16 +40,21 @@ class AIChatState {
   }
 }
 
+/// Provider per il servizio Gemini (permette override in test)
+final geminiServiceProvider = Provider<GeminiService>((ref) {
+  return GeminiService();
+});
+
 /// Provider per la chat AI
 final aiChatProvider = StateNotifierProvider<AIChatNotifier, AIChatState>((ref) {
-  return AIChatNotifier();
+  return AIChatNotifier(ref.watch(geminiServiceProvider));
 });
 
 /// Notifier per gestire la chat AI
 class AIChatNotifier extends StateNotifier<AIChatState> {
-  final GeminiService _gemini = GeminiService();
+  final GeminiService _gemini;
 
-  AIChatNotifier() : super(const AIChatState());
+  AIChatNotifier(this._gemini) : super(const AIChatState());
 
   /// Imposta il nome dell'utente
   void setUserName(String name) {

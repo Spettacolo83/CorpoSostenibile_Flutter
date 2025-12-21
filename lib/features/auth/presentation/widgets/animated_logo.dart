@@ -158,6 +158,10 @@ class _AnimatedLogoState extends State<AnimatedLogo>
   }
 
   Future<void> _startAnimationSequence() async {
+    // 0. Delay iniziale per permettere il rendering completo
+    await Future.delayed(const Duration(milliseconds: 1500));
+    if (!mounted) return;
+
     // 1. Avvia apparizione foglie (3 secondi)
     _appearController.forward();
 

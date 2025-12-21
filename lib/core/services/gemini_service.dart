@@ -4,8 +4,12 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 /// Servizio per l'interazione con Gemini AI
 class GeminiService {
   /// API Key per Google AI Studio (Gemini)
+  /// Passa la key durante la build con: --dart-define=GEMINI_API_KEY=your_key
   /// Ottieni la tua API key da: https://aistudio.google.com/apikey
-  static const apiKey = 'AIzaSyBqIKbARsuDkAMw2K_3NZ1BD-sjfNOpF0Q';
+  static const apiKey = String.fromEnvironment(
+    'GEMINI_API_KEY',
+    defaultValue: '',
+  );
 
   /// Nome del modello Gemini da utilizzare
   static const modelName = 'gemini-flash-latest';

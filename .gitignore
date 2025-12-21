@@ -54,3 +54,7 @@ coverage/
 
 # Claude Code
 .claude/
+
+# Release builds (contengono API keys)
+releases/*.apk
+releases/*.ipa
