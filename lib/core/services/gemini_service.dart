@@ -1,15 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
+import '../config/secrets.dart';
+
 /// Servizio per l'interazione con Gemini AI
 class GeminiService {
   /// API Key per Google AI Studio (Gemini)
-  /// Passa la key durante la build con: --dart-define=GEMINI_API_KEY=your_key
-  /// Ottieni la tua API key da: https://aistudio.google.com/apikey
-  static const apiKey = String.fromEnvironment(
-    'GEMINI_API_KEY',
-    defaultValue: '',
-  );
+  /// Configurata in lib/core/config/secrets.dart (file gitignored)
+  static const apiKey = Secrets.geminiApiKey;
 
   /// Nome del modello Gemini da utilizzare
   static const modelName = 'gemini-flash-latest';

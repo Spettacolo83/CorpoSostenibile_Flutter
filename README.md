@@ -78,31 +78,40 @@ L'app include un **Assistente AI completamente funzionante** basato su Google Ge
 
 ### Configurazione
 
-L'API key **non è inclusa nel codice sorgente** per motivi di sicurezza. Viene passata durante la build tramite `--dart-define`.
+L'API key **non è inclusa nel codice sorgente** per motivi di sicurezza. Viene gestita tramite un file `secrets.dart` che è escluso da git.
 
-### Come Ottenere una API Key Gratuita
+### Come Configurare l'API Key
 
 1. Vai su [Google AI Studio](https://aistudio.google.com/apikey)
 2. Accedi con il tuo account Google
 3. Clicca su "Create API Key"
-4. Usa la chiave durante la build (vedi sotto)
+4. Copia il file template e inserisci la tua chiave:
+
+```bash
+# Copia il template
+cp lib/core/config/secrets.example.dart lib/core/config/secrets.dart
+
+# Modifica secrets.dart e inserisci la tua API key
+```
+
+Il file `secrets.dart` è automaticamente ignorato da git per proteggere le credenziali.
 
 > **Nota**: La API key gratuita ha dei limiti di utilizzo (richieste al minuto/giorno). Per uso in produzione, considera un piano a pagamento.
 
-### Build con API Key
+### Build
 
 ```bash
 # Debug
-flutter run --dart-define=GEMINI_API_KEY=your_api_key_here
+flutter run
 
 # Release APK
-flutter build apk --release --dart-define=GEMINI_API_KEY=your_api_key_here
+flutter build apk --release
 
 # Release iOS
-flutter build ios --release --dart-define=GEMINI_API_KEY=your_api_key_here
+flutter build ios --release
 ```
 
-> **Sicurezza**: Non committare mai la API key nel repository. I file APK/IPA nella cartella `releases/` contengono già una API key funzionante.
+> **Sicurezza**: Il file `secrets.dart` non viene mai committato nel repository.
 
 ### Personalizzazione del Prompt
 

@@ -58,3 +58,6 @@ coverage/
 # Release builds (contengono API keys)
 releases/*.apk
 releases/*.ipa
+
+# Secrets e API keys (MAI committare!)
+lib/core/config/secrets.dart
