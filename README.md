@@ -181,12 +181,16 @@ Questo approccio garantisce:
 
 ## Architettura
 
-Il progetto segue i principi della **Clean Architecture** per garantire:
+Il progetto segue i principi della **Clean Architecture** con **Riverpod** per lo state management.
 
-- Separazione delle responsabilità
-- Testabilità del codice
-- Manutenibilità a lungo termine
-- Scalabilità delle funzionalità
+Per una descrizione dettagliata dell'architettura e dei pattern utilizzati, consulta la [documentazione tecnica](docs/ARCHITECTURE.md).
+
+**Caratteristiche principali:**
+
+- Separazione delle responsabilità in 3 layer (Data, Domain, Presentation)
+- State management reattivo e testabile con Riverpod
+- Dependency Injection per mockabilità nei test
+- Pattern immutabile per la gestione dello stato
 
 ### Struttura del Progetto
 
