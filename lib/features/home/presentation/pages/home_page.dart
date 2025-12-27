@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -5,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../config/routes/app_router.dart';
 import '../../../../config/theme/app_colors.dart';
+import '../../../../config/theme/app_theme.dart';
 import '../../../../config/theme/theme_provider.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
@@ -109,9 +112,23 @@ class _HomePageState extends ConsumerState<HomePage> {
     ];
 
     final currentTheme = ref.watch(themeProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              color: isDark
+                  ? AppColors.backgroundDark.withValues(alpha: 0.7)
+                  : AppColors.background.withValues(alpha: 0.8),
+            ),
+          ),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.auto_awesome),
           tooltip: 'Assistente AI',
@@ -230,8 +247,16 @@ class _DashboardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Top padding ridotto: solo safe area + piccolo gap
+    final topInset = MediaQuery.of(context).padding.top + 12;
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppConstants.defaultPadding),
+      padding: EdgeInsets.only(
+        top: topInset,
+        left: AppConstants.defaultPadding,
+        right: AppConstants.defaultPadding,
+        bottom: AppConstants.defaultPadding,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -249,19 +274,21 @@ class _DashboardView extends StatelessWidget {
 
   Widget _buildGreetingCard(BuildContext context, String name) {
     final greeting = name.isNotEmpty ? 'Ciao, $name!' : 'Ciao!';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryLight],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+        gradient: AppColors.primaryGradient,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge), // ARROTONDATO
+        border: Border.all(
+          color: AppColors.accent.withValues(alpha: 0.3),
+          width: 1,
         ),
-        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.3),
-            blurRadius: 15,
+            color: AppColors.primary.withValues(alpha: isDark ? 0.4 : 0.25),
+            blurRadius: 20,
             offset: const Offset(0, 8),
           ),
         ],
@@ -271,13 +298,24 @@ class _DashboardView extends StatelessWidget {
         children: [
           Row(
             children: [
-              CircleAvatar(
-                radius: 28,
-                backgroundColor: Colors.white.withValues(alpha: 0.2),
-                child: const Icon(
-                  Icons.person,
-                  color: Colors.white,
-                  size: 32,
+              // Avatar con bordo tech
+              Container(
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.5),
+                    width: 2,
+                  ),
+                ),
+                child: CircleAvatar(
+                  radius: 26,
+                  backgroundColor: Colors.white.withValues(alpha: 0.15),
+                  child: const Icon(
+                    Icons.person,
+                    color: Colors.white,
+                    size: 28,
+                  ),
                 ),
               ),
               const SizedBox(width: 16),
@@ -289,13 +327,14 @@ class _DashboardView extends StatelessWidget {
                       greeting,
                       style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w700,
                           ),
                     ),
+                    const SizedBox(height: 4),
                     Text(
                       'Continua il tuo percorso di benessere',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.white.withValues(alpha: 0.9),
+                            color: Colors.white.withValues(alpha: 0.85),
                           ),
                     ),
                   ],
@@ -323,8 +362,9 @@ class _DashboardView extends StatelessWidget {
               child: _QuickActionCard(
                 icon: Icons.calendar_today,
                 title: 'Appuntamenti',
-                color: AppColors.textSecondary,
+                color: AppColors.secondary, // Viola tech
                 onTap: onNavigateToAppointments,
+                isSquared: true, // SQUADRATO
               ),
             ),
             const SizedBox(width: 12),
@@ -332,8 +372,9 @@ class _DashboardView extends StatelessWidget {
               child: _QuickActionCard(
                 icon: Icons.menu_book,
                 title: 'Piano Alimentare',
-                color: AppColors.accent,
+                color: AppColors.primary, // Verde primary leggibile
                 onTap: onNavigateToPlan,
+                isSquared: false, // ARROTONDATO
               ),
             ),
           ],
@@ -347,6 +388,7 @@ class _DashboardView extends StatelessWidget {
                 title: 'Messaggi',
                 color: AppColors.info,
                 onTap: onNavigateToChat,
+                isSquared: false, // ARROTONDATO
               ),
             ),
             const SizedBox(width: 12),
@@ -354,8 +396,9 @@ class _DashboardView extends StatelessWidget {
               child: _QuickActionCard(
                 icon: Icons.article_outlined,
                 title: 'Risorse',
-                color: AppColors.warning,
+                color: AppColors.neonOrange, // NEON!
                 onTap: onNavigateToResources,
+                isSquared: true, // SQUADRATO
               ),
             ),
           ],
@@ -365,6 +408,8 @@ class _DashboardView extends StatelessWidget {
   }
 
   Widget _buildProgressSection(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -373,30 +418,37 @@ class _DashboardView extends StatelessWidget {
           style: Theme.of(context).textTheme.titleLarge,
         ),
         const SizedBox(height: 12),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                _ProgressIndicator(
-                  label: 'Obiettivo settimanale',
-                  progress: 0.7,
-                  color: AppColors.warning,
-                ),
-                const SizedBox(height: 16),
-                _ProgressIndicator(
-                  label: 'Piano alimentare',
-                  progress: 0.85,
-                  color: AppColors.accent,
-                ),
-                const SizedBox(height: 16),
-                _ProgressIndicator(
-                  label: 'Idratazione',
-                  progress: 0.6,
-                  color: AppColors.info,
-                ),
-              ],
+        // Card SQUADRATA per coerenza con greeting
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            borderRadius: BorderRadius.circular(AppTheme.radiusNone), // SQUADRATO
+            border: Border.all(
+              color: isDark ? AppColors.borderDark : AppColors.divider,
+              width: 1,
             ),
+          ),
+          child: Column(
+            children: [
+              _ProgressIndicator(
+                label: 'Obiettivo settimanale',
+                progress: 0.7,
+                color: AppColors.neonOrange, // NEON!
+              ),
+              const SizedBox(height: 16),
+              _ProgressIndicator(
+                label: 'Piano alimentare',
+                progress: 0.85,
+                color: AppColors.primary, // Verde primary leggibile
+              ),
+              const SizedBox(height: 16),
+              _ProgressIndicator(
+                label: 'Idratazione',
+                progress: 0.6,
+                color: AppColors.info,
+              ),
+            ],
           ),
         ),
       ],
@@ -404,6 +456,8 @@ class _DashboardView extends StatelessWidget {
   }
 
   Widget _buildRecentActivities(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -420,23 +474,38 @@ class _DashboardView extends StatelessWidget {
             ),
           ],
         ),
-        Card(
+        // Card ARROTONDATA (alternata con quella squadrata sopra)
+        Container(
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+            border: Border.all(
+              color: isDark ? AppColors.borderDark : AppColors.divider,
+              width: 1,
+            ),
+          ),
           child: Column(
-            children: const [
+            children: [
               _ActivityItem(
                 icon: Icons.check_circle,
                 title: 'Colazione completata',
                 subtitle: 'Oggi, 08:30',
-                color: AppColors.warning,
+                color: AppColors.neonOrange, // NEON!
               ),
-              Divider(height: 1),
+              Divider(
+                height: 1,
+                color: isDark ? AppColors.borderDark : AppColors.divider,
+              ),
               _ActivityItem(
                 icon: Icons.local_drink,
                 title: 'Obiettivo acqua raggiunto',
                 subtitle: 'Ieri, 18:00',
                 color: AppColors.info,
               ),
-              Divider(height: 1),
+              Divider(
+                height: 1,
+                color: isDark ? AppColors.borderDark : AppColors.divider,
+              ),
               _ActivityItem(
                 icon: Icons.event_available,
                 title: 'Appuntamento confermato',
@@ -451,61 +520,83 @@ class _DashboardView extends StatelessWidget {
   }
 }
 
-/// Card per azioni rapide
+/// Card per azioni rapide - Stile Tech con alternanza
 class _QuickActionCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final Color color;
   final VoidCallback onTap;
+  final bool isSquared;
 
   const _QuickActionCard({
     required this.icon,
     required this.title,
     required this.color,
     required this.onTap,
+    this.isSquared = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    // In dark mode, use a lighter version for gray/dark colors
+    // In dark mode, use appropriate colors
     Color displayColor = color;
     if (isDark) {
       if (color == AppColors.textSecondary) {
-        displayColor = const Color(0xFF9CA3AF); // Grigio chiaro visibile
+        displayColor = AppColors.textSecondaryDark;
       }
     }
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: displayColor.withValues(alpha: isDark ? 0.2 : 0.1),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: displayColor.withValues(alpha: isDark ? 0.4 : 0.2)),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: displayColor, size: 32),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: displayColor,
-                    fontWeight: FontWeight.w600,
-                  ),
-              textAlign: TextAlign.center,
+    final borderRadius = isSquared ? AppTheme.radiusNone : AppTheme.radiusMedium;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isDark
+                ? AppColors.surfaceVariantDark
+                : displayColor.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(borderRadius),
+            border: Border.all(
+              color: isDark
+                  ? AppColors.borderDark
+                  : displayColor.withValues(alpha: 0.15),
+              width: 1,
             ),
-          ],
+          ),
+          child: Column(
+            children: [
+              // Icona con sfondo tech - SQUADRATA per coerenza
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: displayColor.withValues(alpha: isDark ? 0.2 : 0.12),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+                ),
+                child: Icon(icon, color: displayColor, size: 26),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-/// Indicatore di progresso
+/// Indicatore di progresso - Stile Tech
 class _ProgressIndicator extends StatelessWidget {
   final String label;
   final double progress;
@@ -519,30 +610,46 @@ class _ProgressIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: Theme.of(context).textTheme.bodyMedium),
             Text(
-              '${(progress * 100).toInt()}%',
+              label,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: color,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: isDark ? 0.2 : 0.1),
+                borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+              ),
+              child: Text(
+                '${(progress * 100).toInt()}%',
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: color,
+                    ),
+              ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         ClipRRect(
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
           child: LinearProgressIndicator(
             value: progress,
-            backgroundColor: color.withValues(alpha: 0.2),
+            backgroundColor: isDark
+                ? color.withValues(alpha: 0.15)
+                : color.withValues(alpha: 0.12),
             valueColor: AlwaysStoppedAnimation<Color>(color),
-            minHeight: 8,
+            minHeight: 6,
           ),
         ),
       ],
@@ -550,7 +657,7 @@ class _ProgressIndicator extends StatelessWidget {
   }
 }
 
-/// Item attività recente
+/// Item attività recente - Stile Tech
 class _ActivityItem extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -566,19 +673,39 @@ class _ActivityItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: color.withValues(alpha: 0.1),
+      leading: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: isDark ? 0.2 : 0.1),
+          borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+        ),
         child: Icon(icon, color: color, size: 20),
       ),
-      title: Text(title),
-      subtitle: Text(subtitle),
-      trailing: const Icon(Icons.chevron_right),
+      title: Text(
+        title,
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w500,
+              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            ),
+      ),
+      trailing: Icon(
+        Icons.chevron_right,
+        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+      ),
     );
   }
 }
 
-/// Vista Profilo
+/// Vista Profilo - Stile Tech
 class _ProfileView extends ConsumerWidget {
   final String displayName;
   final String email;
@@ -590,31 +717,62 @@ class _ProfileView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Top padding ridotto: solo safe area + piccolo gap
+    final topInset = MediaQuery.of(context).padding.top + 12;
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppConstants.defaultPadding),
+      padding: EdgeInsets.only(
+        top: topInset,
+        left: AppConstants.defaultPadding,
+        right: AppConstants.defaultPadding,
+        bottom: AppConstants.defaultPadding,
+      ),
       child: Column(
         children: [
-          const SizedBox(height: 32),
-          // Avatar utente
-          CircleAvatar(
-            radius: 50,
-            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-            child: const Icon(
-              Icons.person,
-              size: 50,
-              color: AppColors.primary,
+          const SizedBox(height: 16),
+          // Avatar utente con glow tech
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppColors.primary.withValues(alpha: 0.5),
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: isDark ? 0.3 : 0.2),
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: CircleAvatar(
+              radius: 48,
+              backgroundColor: isDark
+                  ? AppColors.surfaceVariantDark
+                  : AppColors.primary.withValues(alpha: 0.1),
+              child: const Icon(
+                Icons.person,
+                size: 48,
+                color: AppColors.primary,
+              ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Text(
             displayName.isNotEmpty ? displayName : 'Utente',
-            style: Theme.of(context).textTheme.headlineSmall,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                ),
           ),
           const SizedBox(height: 4),
           Text(
             email,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                 ),
           ),
           const SizedBox(height: 32),
@@ -640,17 +798,20 @@ class _ProfileView extends ConsumerWidget {
             onTap: () {},
           ),
           const SizedBox(height: 24),
-          // Pulsante Logout
+          // Pulsante Logout - Stile Tech
           SizedBox(
             width: double.infinity,
+            height: 52,
             child: OutlinedButton.icon(
               onPressed: () => _showLogoutDialog(context, ref),
-              icon: const Icon(Icons.logout, color: AppColors.error),
+              icon: const Icon(Icons.logout, color: AppColors.error, size: 20),
               label: const Text('Esci'),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.error,
-                side: const BorderSide(color: AppColors.error),
-                padding: const EdgeInsets.symmetric(vertical: 14),
+                side: const BorderSide(color: AppColors.error, width: 1.5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                ),
               ),
             ),
           ),
@@ -676,7 +837,7 @@ class _ProfileView extends ConsumerWidget {
               Navigator.pop(dialogContext);
               await ref.read(authProvider.notifier).logout();
               if (context.mounted) {
-                context.go(AppRoutes.login);
+                context.go(AppRoutes.splash);
               }
             },
             child: const Text(
@@ -690,7 +851,7 @@ class _ProfileView extends ConsumerWidget {
   }
 }
 
-/// Elemento menu profilo
+/// Elemento menu profilo - Stile Tech
 class _ProfileMenuItem extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -704,13 +865,42 @@ class _ProfileMenuItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
       margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : AppColors.divider,
+          width: 1,
+        ),
+      ),
       child: ListTile(
-        leading: Icon(icon, color: AppColors.primary),
-        title: Text(title),
-        trailing: const Icon(Icons.chevron_right),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: isDark ? 0.15 : 0.1),
+            borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+          ),
+          child: Icon(icon, color: AppColors.primary, size: 20),
+        ),
+        title: Text(
+          title,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              ),
+        ),
+        trailing: Icon(
+          Icons.chevron_right,
+          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+        ),
         onTap: onTap,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        ),
       ),
     );
   }
@@ -799,6 +989,7 @@ class _AIAssistantSheetState extends ConsumerState<_AIAssistantSheet> {
   @override
   Widget build(BuildContext context) {
     final chatState = ref.watch(aiChatProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Scroll automatico quando arrivano nuovi messaggi
     ref.listen(aiChatProvider, (previous, next) {
@@ -814,8 +1005,8 @@ class _AIAssistantSheetState extends ConsumerState<_AIAssistantSheet> {
       child: Container(
         height: MediaQuery.of(context).size.height * 0.85,
         decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          color: isDark ? AppColors.backgroundDark : AppColors.background,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusXL)),
         ),
         child: Column(
           children: [
@@ -833,20 +1024,34 @@ class _AIAssistantSheetState extends ConsumerState<_AIAssistantSheet> {
   }
 
   Widget _buildHeader(BuildContext context, bool hasMessages) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusXL)),
+        border: Border(
+          bottom: BorderSide(
+            color: isDark ? AppColors.borderDark : AppColors.divider,
+            width: 1,
+          ),
+        ),
       ),
       child: Row(
         children: [
           // Tasto reset (solo se ci sono messaggi)
           if (hasMessages)
-            IconButton(
-              onPressed: _resetChat,
-              icon: const Icon(Icons.refresh),
-              tooltip: 'Nuova conversazione',
+            Container(
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.surfaceVariantDark : AppColors.surfaceVariant,
+                borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+              ),
+              child: IconButton(
+                onPressed: _resetChat,
+                icon: const Icon(Icons.refresh, size: 20),
+                tooltip: 'Nuova conversazione',
+              ),
             )
           else
             const SizedBox(width: 48),
@@ -854,24 +1059,45 @@ class _AIAssistantSheetState extends ConsumerState<_AIAssistantSheet> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SvgPicture.asset(
-                  'assets/icons/logo.svg',
-                  height: 32,
-                  width: 32,
+                // Logo con glow
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.3),
+                        blurRadius: 12,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                  child: SvgPicture.asset(
+                    'assets/icons/logo.svg',
+                    height: 28,
+                    width: 28,
+                  ),
                 ),
                 const SizedBox(width: 10),
                 Text(
                   'Assistente AI',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                       ),
                 ),
               ],
             ),
           ),
-          IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.close),
+          Container(
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.surfaceVariantDark : AppColors.surfaceVariant,
+              borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+            ),
+            child: IconButton(
+              onPressed: () => Navigator.pop(context),
+              icon: const Icon(Icons.close, size: 20),
+            ),
           ),
         ],
       ),
@@ -880,6 +1106,7 @@ class _AIAssistantSheetState extends ConsumerState<_AIAssistantSheet> {
 
   Widget _buildSuggestions(BuildContext context) {
     final displayName = widget.userName.isNotEmpty ? widget.userName : 'Utente';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -887,26 +1114,38 @@ class _AIAssistantSheetState extends ConsumerState<_AIAssistantSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 24),
+          // Icona AI con glow tech
           Center(
             child: Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.primary.withValues(alpha: isDark ? 0.15 : 0.1),
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: isDark ? 0.4 : 0.25),
+                    blurRadius: 30,
+                    spreadRadius: 5,
+                  ),
+                ],
               ),
-              child: const Icon(
-                Icons.auto_awesome,
-                size: 48,
-                color: AppColors.primary,
+              child: ShaderMask(
+                shaderCallback: (bounds) => AppColors.primaryGradient.createShader(bounds),
+                child: const Icon(
+                  Icons.auto_awesome,
+                  size: 44,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
           Center(
             child: Text(
               'Ciao $displayName, come posso aiutarti?',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
               textAlign: TextAlign.center,
             ),
@@ -916,7 +1155,7 @@ class _AIAssistantSheetState extends ConsumerState<_AIAssistantSheet> {
             child: Text(
               'Chiedimi qualsiasi cosa sul tuo percorso!',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                   ),
             ),
           ),
@@ -924,7 +1163,8 @@ class _AIAssistantSheetState extends ConsumerState<_AIAssistantSheet> {
           Text(
             'Suggerimenti',
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                 ),
           ),
           const SizedBox(height: 12),
@@ -933,10 +1173,24 @@ class _AIAssistantSheetState extends ConsumerState<_AIAssistantSheet> {
             runSpacing: 8,
             children: _suggestions.map((suggestion) {
               return ActionChip(
-                label: Text(suggestion),
+                label: Text(
+                  suggestion,
+                  style: TextStyle(
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    fontSize: 13,
+                  ),
+                ),
                 onPressed: () => _sendMessage(suggestion),
-                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                side: BorderSide.none,
+                backgroundColor: isDark
+                    ? AppColors.surfaceVariantDark
+                    : AppColors.primary.withValues(alpha: 0.08),
+                side: BorderSide(
+                  color: isDark ? AppColors.borderDark : AppColors.primary.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+                ),
               );
             }).toList(),
           ),
@@ -965,15 +1219,21 @@ class _AIAssistantSheetState extends ConsumerState<_AIAssistantSheet> {
   }
 
   Widget _buildTypingIndicator(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Align(
       alignment: Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(20).copyWith(
+          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMedium).copyWith(
             bottomLeft: const Radius.circular(4),
+          ),
+          border: Border.all(
+            color: isDark ? AppColors.borderDark : AppColors.divider,
+            width: 1,
           ),
         ),
         child: Row(
@@ -1000,7 +1260,7 @@ class _AIAssistantSheetState extends ConsumerState<_AIAssistantSheet> {
           height: 8,
           decoration: BoxDecoration(
             color: AppColors.primary.withValues(alpha: 0.3 + (value * 0.7)),
-            shape: BoxShape.circle,
+            borderRadius: BorderRadius.circular(2),
           ),
         );
       },
@@ -1008,6 +1268,8 @@ class _AIAssistantSheetState extends ConsumerState<_AIAssistantSheet> {
   }
 
   Widget _buildInput(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: EdgeInsets.only(
         left: 16,
@@ -1016,14 +1278,13 @@ class _AIAssistantSheetState extends ConsumerState<_AIAssistantSheet> {
         bottom: MediaQuery.of(context).padding.bottom + 12,
       ),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
+        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        border: Border(
+          top: BorderSide(
+            color: isDark ? AppColors.borderDark : AppColors.divider,
+            width: 1,
           ),
-        ],
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -1036,33 +1297,52 @@ class _AIAssistantSheetState extends ConsumerState<_AIAssistantSheet> {
                 maxLines: null,
                 minLines: 1,
                 textInputAction: TextInputAction.newline,
+                style: TextStyle(
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                ),
                 decoration: InputDecoration(
                   hintText: 'Scrivi un messaggio...',
+                  hintStyle: TextStyle(
+                    color: isDark ? AppColors.textHintDark : AppColors.textHint,
+                  ),
                   filled: true,
-                  fillColor: Theme.of(context).scaffoldBackgroundColor,
+                  fillColor: isDark ? AppColors.surfaceVariantDark : AppColors.surfaceVariant,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 10,
+                    vertical: 12,
                   ),
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
+          // Send button con gradient
           Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppColors.primary, AppColors.primaryLight],
-              ),
-              shape: BoxShape.circle,
+            decoration: BoxDecoration(
+              gradient: AppColors.primaryGradient,
+              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-            child: IconButton(
-              onPressed: () => _sendMessage(_controller.text),
-              icon: const Icon(Icons.send, color: Colors.white, size: 20),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _sendMessage(_controller.text),
+                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                child: const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Icon(Icons.send, color: Colors.white, size: 22),
+                ),
+              ),
             ),
           ),
         ],
@@ -1079,7 +1359,7 @@ class _AIMessage {
   const _AIMessage({required this.text, required this.isUser});
 }
 
-/// Bolla di messaggio AI con supporto markdown
+/// Bolla di messaggio AI con supporto markdown - Stile Tech
 class _AIMessageBubble extends StatelessWidget {
   final _AIMessage message;
 
@@ -1087,24 +1367,40 @@ class _AIMessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = message.isUser ? Colors.white : Theme.of(context).textTheme.bodyMedium?.color;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = message.isUser
+        ? Colors.white
+        : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary);
 
     return Align(
       alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          gradient: message.isUser
-              ? const LinearGradient(
-                  colors: [AppColors.primary, AppColors.primaryLight],
-                )
-              : null,
-          color: message.isUser ? null : Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(20).copyWith(
+          gradient: message.isUser ? AppColors.primaryGradient : null,
+          color: message.isUser
+              ? null
+              : (isDark ? AppColors.surfaceDark : AppColors.surface),
+          borderRadius: BorderRadius.circular(AppTheme.radiusMedium).copyWith(
             bottomRight: message.isUser ? const Radius.circular(4) : null,
             bottomLeft: !message.isUser ? const Radius.circular(4) : null,
           ),
+          border: message.isUser
+              ? null
+              : Border.all(
+                  color: isDark ? AppColors.borderDark : AppColors.divider,
+                  width: 1,
+                ),
+          boxShadow: message.isUser
+              ? [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
         constraints: BoxConstraints(
           maxWidth: MediaQuery.of(context).size.width * 0.75,

@@ -1,11 +1,9 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 /// Widget che anima il logo SVG con le 3 foglie separate.
-/// Ogni foglia appare in sequenza e poi ondeggia con effetto vento.
+/// Ogni foglia appare in sequenza e poi pulsa con effetto battito cardiaco.
 class AnimatedLogo extends StatefulWidget {
   final double size;
   final VoidCallback? onLeavesAppeared;
@@ -35,12 +33,9 @@ class _AnimatedLogoState extends State<AnimatedLogo>
   late final Animation<double> _fogliaDestra;
   late final Animation<double> _fogliaSinistra;
 
-  // Controller per l'ondeggiamento (vento)
-  late final AnimationController _windController;
-  late final Animation<double> _windAnimation;
-
-  // Sequenza rotazioni: 0° → 5° → -4° → 3° → -2° → 0°
-  final List<double> _rotationSequence = [0, 5, -4, 3, -2, 0];
+  // Controller per il battito cardiaco (3 battiti)
+  late final AnimationController _heartbeatController;
+  late final Animation<double> _heartbeatAnimation;
 
   bool _isLoaded = false;
 
@@ -82,16 +77,18 @@ class _AnimatedLogoState extends State<AnimatedLogo>
       ),
     );
 
-    // Controller vento: 4 secondi (5 rotazioni × 0.5s = 2.5s + pausa)
-    _windController = AnimationController(
+    // Controller battito cardiaco: 3 battiti in ~4.5 secondi
+    // Ogni battito: lub-dub + pausa = 1.5s per battito
+    _heartbeatController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 4000),
+      duration: const Duration(milliseconds: 4500),
     );
 
-    _windAnimation = Tween<double>(begin: 0.0, end: 5.0).animate(
+    // Animazione da 0 a 3 (3 battiti)
+    _heartbeatAnimation = Tween<double>(begin: 0.0, end: 3.0).animate(
       CurvedAnimation(
-        parent: _windController,
-        curve: const Interval(0.0, 0.625, curve: Curves.linear),
+        parent: _heartbeatController,
+        curve: Curves.linear,
       ),
     );
   }
@@ -165,40 +162,67 @@ class _AnimatedLogoState extends State<AnimatedLogo>
     // 1. Avvia apparizione foglie (3 secondi)
     _appearController.forward();
 
-    // 2. Dopo 3 secondi, notifica che le foglie sono apparse e avvia ondeggiamento
+    // 2. Dopo 3 secondi, notifica che le foglie sono apparse e avvia battito cardiaco
     await Future.delayed(const Duration(seconds: 3));
     if (!mounted) return;
     widget.onLeavesAppeared?.call();
-    _windController.forward();
+    _heartbeatController.forward();
 
-    // 3. Dopo 4 secondi di vento, notifica completamento
-    await Future.delayed(const Duration(seconds: 4));
+    // 3. Dopo 4.5 secondi di battito (3 battiti), notifica completamento
+    await Future.delayed(const Duration(milliseconds: 4500));
     if (!mounted) return;
     widget.onAnimationComplete?.call();
   }
 
-  double _getRotationAngle(double animationValue) {
-    if (animationValue >= 5.0) return 0.0;
+  /// Calcola la scala per l'effetto battito cardiaco realistico.
+  /// Ogni battito ha 2 pulsazioni (lub-dub):
+  /// - LUB: pulsazione forte (1.0 → 1.15 → 1.0)
+  /// - DUB: pulsazione più debole (1.0 → 1.08 → 1.0)
+  /// - Pausa prima del prossimo battito
+  double _getHeartbeatScale(double animationValue) {
+    if (animationValue >= 3.0) return 1.0;
 
-    final index = animationValue.floor();
-    final progress = animationValue - index;
+    // Ogni battito completo occupa 1 unità di animationValue
+    // Struttura di un battito:
+    // 0.00-0.20: LUB (pulsazione forte)
+    // 0.20-0.40: DUB (pulsazione debole)
+    // 0.40-1.00: Pausa
+    final beatProgress = animationValue % 1.0;
 
-    if (index >= _rotationSequence.length - 1) {
-      return _rotationSequence.last;
+    if (beatProgress < 0.20) {
+      // LUB - Prima pulsazione (forte): 1.0 → 1.15 → 1.0
+      final lubProgress = beatProgress / 0.20;
+      if (lubProgress < 0.5) {
+        // Zoom in
+        final zoomIn = lubProgress / 0.5;
+        return 1.0 + (0.15 * Curves.easeOut.transform(zoomIn));
+      } else {
+        // Zoom out
+        final zoomOut = (lubProgress - 0.5) / 0.5;
+        return 1.15 - (0.15 * Curves.easeIn.transform(zoomOut));
+      }
+    } else if (beatProgress < 0.40) {
+      // DUB - Seconda pulsazione (debole): 1.0 → 1.08 → 1.0
+      final dubProgress = (beatProgress - 0.20) / 0.20;
+      if (dubProgress < 0.5) {
+        // Zoom in
+        final zoomIn = dubProgress / 0.5;
+        return 1.0 + (0.08 * Curves.easeOut.transform(zoomIn));
+      } else {
+        // Zoom out
+        final zoomOut = (dubProgress - 0.5) / 0.5;
+        return 1.08 - (0.08 * Curves.easeIn.transform(zoomOut));
+      }
+    } else {
+      // Pausa tra i battiti
+      return 1.0;
     }
-
-    final startAngle = _rotationSequence[index];
-    final endAngle = _rotationSequence[index + 1];
-
-    // Interpolazione smooth
-    final easedProgress = Curves.easeInOut.transform(progress);
-    return startAngle + (endAngle - startAngle) * easedProgress;
   }
 
   @override
   void dispose() {
     _appearController.dispose();
-    _windController.dispose();
+    _heartbeatController.dispose();
     super.dispose();
   }
 
@@ -217,37 +241,36 @@ class _AnimatedLogoState extends State<AnimatedLogo>
       child: AnimatedBuilder(
         animation: Listenable.merge([
           _appearController,
-          _windController,
+          _heartbeatController,
         ]),
         builder: (context, child) {
-          final rotation = _getRotationAngle(_windAnimation.value);
-          final rotationRadians = rotation * math.pi / 180;
+          final heartbeatScale = _getHeartbeatScale(_heartbeatAnimation.value);
 
-          return Stack(
-            alignment: Alignment.center,
-            children: [
-              // Foglia basso (appare per prima)
-              if (_svgFogliaBasso != null)
-                _buildAnimatedLeaf(
-                  _svgFogliaBasso!,
-                  _fogliaBasso.value,
-                  rotationRadians,
-                ),
-              // Foglia destra (appare seconda)
-              if (_svgFogliaDestra != null)
-                _buildAnimatedLeaf(
-                  _svgFogliaDestra!,
-                  _fogliaDestra.value,
-                  rotationRadians,
-                ),
-              // Foglia sinistra (appare terza)
-              if (_svgFogliaSinistra != null)
-                _buildAnimatedLeaf(
-                  _svgFogliaSinistra!,
-                  _fogliaSinistra.value,
-                  rotationRadians,
-                ),
-            ],
+          return Transform.scale(
+            scale: heartbeatScale,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Foglia basso (appare per prima)
+                if (_svgFogliaBasso != null)
+                  _buildAnimatedLeaf(
+                    _svgFogliaBasso!,
+                    _fogliaBasso.value,
+                  ),
+                // Foglia destra (appare seconda)
+                if (_svgFogliaDestra != null)
+                  _buildAnimatedLeaf(
+                    _svgFogliaDestra!,
+                    _fogliaDestra.value,
+                  ),
+                // Foglia sinistra (appare terza)
+                if (_svgFogliaSinistra != null)
+                  _buildAnimatedLeaf(
+                    _svgFogliaSinistra!,
+                    _fogliaSinistra.value,
+                  ),
+              ],
+            ),
           );
         },
       ),
@@ -257,16 +280,13 @@ class _AnimatedLogoState extends State<AnimatedLogo>
   Widget _buildAnimatedLeaf(
     String svgString,
     double appearValue,
-    double rotation,
   ) {
     if (appearValue == 0) return const SizedBox.shrink();
 
     return Positioned.fill(
-      child: Transform(
+      child: Transform.scale(
+        scale: appearValue,
         alignment: Alignment.bottomCenter,
-        transform: Matrix4.identity()
-          ..scale(appearValue)
-          ..rotateZ(rotation),
         child: Opacity(
           opacity: appearValue.clamp(0.0, 1.0),
           child: SvgPicture.string(

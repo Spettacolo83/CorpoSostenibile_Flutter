@@ -11,8 +11,8 @@ import 'core/constants/app_constants.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Configura Google Fonts per non bloccare l'app
-  GoogleFonts.config.allowRuntimeFetching = false;
+  // Configura Google Fonts - permette fetching runtime per evitare crash
+  GoogleFonts.config.allowRuntimeFetching = true;
 
   // Imposta l'orientamento preferito
   await SystemChrome.setPreferredOrientations([

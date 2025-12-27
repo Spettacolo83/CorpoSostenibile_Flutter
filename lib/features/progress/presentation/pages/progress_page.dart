@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
 import '../../../../config/theme/app_colors.dart';
+import '../../../../config/theme/app_theme.dart';
 import '../../../../core/constants/app_constants.dart';
 
-/// Tipo di grafico disponibile
+/// Tipo di grafico disponibile - Colori NEON tech
 enum ChartType {
   weight('Peso', 'kg', Icons.monitor_weight, AppColors.primary),
-  sleep('Sonno', 'ore', Icons.nightlight_round, AppColors.info),
-  bodyMass('Massa', '%', Icons.accessibility_new, AppColors.warning),
-  hydration('Idratazione', 'L', Icons.water_drop, Color(0xFF7B68EE)),
-  calories('Calorie', 'kcal', Icons.local_fire_department, Color(0xFFE57373));
+  sleep('Sonno', 'ore', Icons.nightlight_round, AppColors.neonBlue),
+  bodyMass('Massa', '%', Icons.accessibility_new, AppColors.neonOrange),
+  hydration('Idratazione', 'L', Icons.water_drop, AppColors.neonPurple),
+  calories('Calorie', 'kcal', Icons.local_fire_department, AppColors.neonRed);
 
   final String label;
   final String unit;
@@ -84,9 +85,17 @@ class _ProgressPageState extends State<ProgressPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Top padding ridotto: solo safe area + piccolo gap
+    final topInset = MediaQuery.of(context).padding.top + 12;
+
     return SingleChildScrollView(
       controller: _scrollController,
-      padding: const EdgeInsets.all(AppConstants.defaultPadding),
+      padding: EdgeInsets.only(
+        top: topInset,
+        left: AppConstants.defaultPadding,
+        right: AppConstants.defaultPadding,
+        bottom: AppConstants.defaultPadding,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -105,8 +114,10 @@ class _ProgressPageState extends State<ProgressPage> {
   }
 
   Widget _buildChartSelector(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return SizedBox(
-      height: 40,
+      height: 44,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: ChartType.values.length,
@@ -116,27 +127,48 @@ class _ProgressPageState extends State<ProgressPage> {
           final isSelected = chartType == _selectedChart;
           final chipColor = chartType.color;
 
-          return FilterChip(
-            selected: isSelected,
-            showCheckmark: false,
-            avatar: Icon(
-              chartType.icon,
-              size: 18,
-              color: isSelected ? Colors.white : chipColor,
+          // Chip con bordo neon separato (uniforme visivamente)
+          return Container(
+            padding: isSelected
+                ? const EdgeInsets.symmetric(horizontal: 3, vertical: 1)
+                : EdgeInsets.zero,
+            decoration: isSelected
+                ? BoxDecoration(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSmall + 3),
+                    border: Border.all(
+                      color: chipColor.withValues(alpha: 0.7),
+                      width: 1.5,
+                    ),
+                  )
+                : null,
+            child: FilterChip(
+              selected: isSelected,
+              showCheckmark: false,
+              avatar: Icon(
+                chartType.icon,
+                size: 18,
+                color: isSelected ? Colors.white : chipColor,
+              ),
+              label: Text(chartType.label),
+              labelStyle: TextStyle(
+                color: isSelected ? Colors.white : chipColor,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              ),
+              backgroundColor: isDark
+                  ? AppColors.surfaceVariantDark
+                  : Colors.transparent,
+              selectedColor: chipColor,
+              side: BorderSide(
+                color: isSelected ? chipColor : chipColor.withValues(alpha: 0.5),
+                width: isSelected ? 0 : 1.5,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+              ),
+              onSelected: (_) {
+                setState(() => _selectedChart = chartType);
+              },
             ),
-            label: Text(chartType.label),
-            labelStyle: TextStyle(
-              color: isSelected ? Colors.white : chipColor,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            ),
-            backgroundColor: Colors.transparent,
-            selectedColor: chipColor,
-            side: BorderSide(
-              color: isSelected ? chipColor : chipColor.withValues(alpha: 0.5),
-            ),
-            onSelected: (_) {
-              setState(() => _selectedChart = chartType);
-            },
           );
         },
       ),
@@ -144,7 +176,16 @@ class _ProgressPageState extends State<ProgressPage> {
   }
 
   Widget _buildSelectedChart(BuildContext context) {
-    return Card(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // SQUADRATO
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusNone),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : AppColors.border,
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -179,21 +220,23 @@ class _ProgressPageState extends State<ProgressPage> {
   }
 
   Widget _buildChartBadge(BuildContext context) {
+    // Badge info - usa il colore del chart selezionato
     final badges = {
-      ChartType.weight: ('-4.2 kg', AppColors.success, Icons.trending_down),
-      ChartType.sleep: ('+0.5h', AppColors.success, Icons.trending_up),
-      ChartType.bodyMass: ('-2.3%', AppColors.success, Icons.trending_down),
-      ChartType.hydration: ('+0.3L', AppColors.success, Icons.trending_up),
-      ChartType.calories: ('-150', AppColors.info, Icons.trending_down),
+      ChartType.weight: ('-4.2 kg', Icons.trending_down),
+      ChartType.sleep: ('+0.5h', Icons.trending_up),
+      ChartType.bodyMass: ('-2.3%', Icons.trending_down),
+      ChartType.hydration: ('+0.3L', Icons.trending_up),
+      ChartType.calories: ('-150', Icons.trending_down),
     };
 
-    final (value, color, icon) = badges[_selectedChart]!;
+    final (value, icon) = badges[_selectedChart]!;
+    final color = _selectedChart.color; // Usa il colore del chart!
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -281,7 +324,7 @@ class _ProgressPageState extends State<ProgressPage> {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: AppColors.info.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
               ),
               child: const Icon(
                 Icons.watch,
@@ -382,7 +425,7 @@ class _ProgressPageState extends State<ProgressPage> {
                 title: 'Passi',
                 value: '8,432',
                 subtitle: 'Obiettivo: 10,000',
-                color: AppColors.warning,
+                color: AppColors.neonPurple, // Viola neon
                 progress: 0.84,
               ),
             ),
@@ -435,7 +478,7 @@ class _ProgressPageState extends State<ProgressPage> {
               Icons.self_improvement,
               'Mindfulness',
               '35 min totali',
-              AppColors.warning,
+              AppColors.neonPurple, // Viola neon
             ),
           ],
         ),
@@ -479,7 +522,7 @@ class _ProgressPageState extends State<ProgressPage> {
   }
 }
 
-/// Card per mostrare un indicatore di progresso
+/// Card per mostrare un indicatore di progresso - SQUADRATA
 class _ProgressCard extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -499,7 +542,16 @@ class _ProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // SQUADRATA
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusNone),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : AppColors.border,
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

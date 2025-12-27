@@ -94,7 +94,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
     });
 
     return Scaffold(
-      backgroundColor: AppColors.primaryDark,
+      backgroundColor: AppColors.splashBackground,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../config/theme/app_colors.dart';
+import '../../../../config/theme/app_theme.dart';
 import '../../../../core/constants/app_constants.dart';
 
 /// Modello per un contatto chat
@@ -59,7 +60,7 @@ class ChatPage extends StatefulWidget {
       lastMessage: 'Come ti sei sentito questa settimana con il nuovo approccio?',
       time: 'Ieri',
       unreadCount: 1,
-      roleColor: AppColors.info,
+      roleColor: AppColors.neonPurple, // Viola neon
       avatarPath: 'assets/images/delia_avatar.png',
     ),
     ChatContact(
@@ -121,8 +122,12 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Top padding ridotto: solo safe area + piccolo gap
+    final topInset = MediaQuery.of(context).padding.top + 12;
+
     return Column(
       children: [
+        SizedBox(height: topInset),
         _buildSearchBar(context),
         Expanded(
           child: ListView.builder(
@@ -147,7 +152,7 @@ class _ChatPageState extends State<ChatPage> {
           filled: true,
           fillColor: Theme.of(context).cardColor,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
             borderSide: BorderSide.none,
           ),
           contentPadding: const EdgeInsets.symmetric(
@@ -447,7 +452,7 @@ class _ChatDetailSheetState extends State<_ChatDetailSheet> {
                   widget.contact.isOnline ? 'Online' : 'Offline',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: widget.contact.isOnline
-                            ? AppColors.success
+                            ? AppColors.primaryMedium // Verde più scuro, leggibile
                             : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
                       ),
                 ),
@@ -590,7 +595,7 @@ class _MessageBubble extends StatelessWidget {
           color: message.isMe
               ? myMessageColor
               : Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(20).copyWith(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMedium).copyWith(
             bottomRight: message.isMe ? const Radius.circular(4) : null,
             bottomLeft: !message.isMe ? const Radius.circular(4) : null,
           ),

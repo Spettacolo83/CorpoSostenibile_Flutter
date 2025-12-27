@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../config/theme/app_colors.dart';
+import '../../../../config/theme/app_theme.dart';
 import '../../../../core/constants/app_constants.dart';
 
 /// Tipo di scroll per la pagina Team
@@ -102,7 +103,7 @@ class _ProfessionalsPageState extends State<ProfessionalsPage> {
           'Niente giudizi, solo comprensione e crescita.',
       rating: 4.9,
       reviewCount: 156,
-      color: AppColors.info,
+      color: AppColors.neonPurple, // Viola neon
       avatarPath: 'assets/images/delia_avatar.png',
     ),
   ];
@@ -115,7 +116,7 @@ class _ProfessionalsPageState extends State<ProfessionalsPage> {
           'Non come sacrificio, ma come regalo al tuo corpo!',
       author: 'Alice P.',
       icon: Icons.restaurant,
-      color: AppColors.primary,
+      color: AppColors.primary, // Verde neon
     ),
     DailyTip(
       title: 'Movimento del Giorno',
@@ -124,7 +125,7 @@ class _ProfessionalsPageState extends State<ProfessionalsPage> {
           'e il tuo umore. Provaci!',
       author: 'Lorenzo S.',
       icon: Icons.directions_walk,
-      color: AppColors.warning,
+      color: AppColors.neonOrange, // NEON arancione!
     ),
     DailyTip(
       title: 'Mindfulness',
@@ -133,7 +134,7 @@ class _ProfessionalsPageState extends State<ProfessionalsPage> {
           'o sto cercando altro?" La consapevolezza è il primo passo.',
       author: 'Delia D.S.',
       icon: Icons.self_improvement,
-      color: AppColors.info,
+      color: AppColors.neonBlue, // NEON blu!
     ),
   ];
 
@@ -185,9 +186,17 @@ class _ProfessionalsPageState extends State<ProfessionalsPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Top padding ridotto: solo safe area + piccolo gap
+    final topInset = MediaQuery.of(context).padding.top + 12;
+
     return SingleChildScrollView(
       controller: _scrollController,
-      padding: const EdgeInsets.all(AppConstants.defaultPadding),
+      padding: EdgeInsets.only(
+        top: topInset,
+        left: AppConstants.defaultPadding,
+        right: AppConstants.defaultPadding,
+        bottom: AppConstants.defaultPadding,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -204,6 +213,13 @@ class _ProfessionalsPageState extends State<ProfessionalsPage> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Colore testo descrizione: grigio scuro in light mode, bianco in dark mode
+    final descriptionColor = isDark
+        ? Colors.white.withValues(alpha: 0.9)
+        : const Color(0xFF1A3A2F); // Grigio-verde scuro, leggibile su sfondo verde
+
+    // ARROTONDATO
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -215,7 +231,7 @@ class _ProfessionalsPageState extends State<ProfessionalsPage> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,7 +260,7 @@ class _ProfessionalsPageState extends State<ProfessionalsPage> {
             'Un approccio integrato con Nutrizionista, Coach e Psicologa '
             'per accompagnarti verso il tuo benessere sostenibile.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: descriptionColor,
                 ),
           ),
         ],
@@ -321,7 +337,7 @@ class _ProfessionalsPageState extends State<ProfessionalsPage> {
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: AppColors.accent.withValues(alpha: isDark ? 0.2 : 0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
                   ),
                   child: const Icon(
                     Icons.event,
@@ -360,7 +376,7 @@ class _ProfessionalsPageState extends State<ProfessionalsPage> {
                 color: isDark
                     ? AppColors.surfaceVariantDark
                     : AppColors.background,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
               ),
               child: Row(
                 children: [
@@ -424,7 +440,7 @@ class _ProfessionalsPageState extends State<ProfessionalsPage> {
   }
 }
 
-/// Card per un consiglio del giorno
+/// Card per un consiglio del giorno - SQUADRATO con NEON GLOW
 class _DailyTipCard extends StatelessWidget {
   final DailyTip tip;
 
@@ -437,11 +453,23 @@ class _DailyTipCard extends StatelessWidget {
       width: 280,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: tip.color.withValues(alpha: isDark ? 0.2 : 0.1),
-        borderRadius: BorderRadius.circular(16),
+        color: isDark
+            ? AppColors.surfaceDark
+            : tip.color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppTheme.radiusNone), // SQUADRATO
         border: Border.all(
-          color: tip.color.withValues(alpha: isDark ? 0.4 : 0.2),
+          color: tip.color.withValues(alpha: isDark ? 0.6 : 0.3),
+          width: 1.5,
         ),
+        // NEON GLOW effect
+        boxShadow: [
+          BoxShadow(
+            color: tip.color.withValues(alpha: isDark ? 0.4 : 0.25),
+            blurRadius: 16,
+            spreadRadius: 0,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -484,7 +512,7 @@ class _DailyTipCard extends StatelessWidget {
   }
 }
 
-/// Card per un professionista
+/// Card per un professionista - SQUADRATA
 class _ProfessionalCard extends StatelessWidget {
   final Professional professional;
   final VoidCallback? onMessageTap;
@@ -497,158 +525,159 @@ class _ProfessionalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundColor:
-                          professional.color.withValues(alpha: 0.2),
-                      backgroundImage: professional.avatarPath != null
-                          ? AssetImage(professional.avatarPath!)
-                          : null,
-                      child: professional.avatarPath == null
-                          ? Text(
-                              professional.name
-                                  .split(' ')
-                                  .map((e) => e[0])
-                                  .take(2)
-                                  .join(),
-                              style: TextStyle(
-                                color: professional.color,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
-                            )
-                          : null,
-                    ),
-                    if (professional.isAvailable)
-                      Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: Container(
-                          width: 14,
-                          height: 14,
-                          decoration: BoxDecoration(
-                            color: AppColors.success,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
-                          ),
+    // SQUADRATA - Container invece di Card
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusNone),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : AppColors.border,
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Stack(
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: professional.color.withValues(alpha: 0.2),
+                    backgroundImage: professional.avatarPath != null
+                        ? AssetImage(professional.avatarPath!)
+                        : null,
+                    child: professional.avatarPath == null
+                        ? Text(
+                            professional.name
+                                .split(' ')
+                                .map((e) => e[0])
+                                .take(2)
+                                .join(),
+                            style: TextStyle(
+                              color: professional.color,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          )
+                        : null,
+                  ),
+                  if (professional.isAvailable)
+                    Positioned(
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        width: 14,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          color: AppColors.success,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
                         ),
                       ),
+                    ),
+                ],
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      professional.name,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? AppColors.textPrimaryDark : null,
+                          ),
+                    ),
+                    const SizedBox(height: 2),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: professional.color.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        professional.role,
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: professional.color,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      professional.specialty,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: isDark
+                                ? AppColors.textSecondaryDark
+                                : AppColors.textSecondary,
+                          ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.star,
+                          color: Colors.amber,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${professional.rating}',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: isDark ? AppColors.textPrimaryDark : null,
+                              ),
+                        ),
+                        Text(
+                          ' (${professional.reviewCount} recensioni)',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: isDark
+                                    ? AppColors.textSecondaryDark
+                                    : AppColors.textSecondary,
+                              ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        professional.name,
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? AppColors.textPrimaryDark : null,
-                            ),
-                      ),
-                      const SizedBox(height: 2),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: professional.color.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          professional.role,
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: professional.color,
-                                fontWeight: FontWeight.w600,
-                              ),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        professional.specialty,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: isDark
-                                  ? AppColors.textSecondaryDark
-                                  : AppColors.textSecondary,
-                            ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.star,
-                            color: Colors.amber,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${professional.rating}',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark ? AppColors.textPrimaryDark : null,
-                                ),
-                          ),
-                          Text(
-                            ' (${professional.reviewCount} recensioni)',
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: isDark
-                                          ? AppColors.textSecondaryDark
-                                          : AppColors.textSecondary,
-                                    ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            professional.description,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: isDark ? AppColors.textPrimaryDark : null,
                 ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              professional.description,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: isDark ? AppColors.textPrimaryDark : null,
-                  ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: OutlinedButton.icon(
-                    onPressed: onMessageTap,
-                    icon: const Icon(Icons.chat_outlined, size: 16),
-                    label: const Text('Chat'),
-                  ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: OutlinedButton.icon(
+                  onPressed: onMessageTap,
+                  icon: const Icon(Icons.chat_outlined, size: 16),
+                  label: const Text('Chat'),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  flex: 2,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    child: const Text('Prenota'),
-                  ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 2,
+                child: ElevatedButton(
+                  onPressed: () {},
+                  child: const Text('Prenota'),
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
