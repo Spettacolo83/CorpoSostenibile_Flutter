@@ -213,13 +213,8 @@ class _ProfessionalsPageState extends State<ProfessionalsPage> {
   }
 
   Widget _buildHeader(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    // Colore testo descrizione: grigio scuro in light mode, bianco in dark mode
-    final descriptionColor = isDark
-        ? Colors.white.withValues(alpha: 0.9)
-        : const Color(0xFF1A3A2F); // Grigio-verde scuro, leggibile su sfondo verde
+    const descriptionColor = Color(0xFF1A3A2F); // Grigio-verde scuro, leggibile
 
-    // ARROTONDATO
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -324,7 +319,6 @@ class _ProfessionalsPageState extends State<ProfessionalsPage> {
   }
 
   Widget _buildNextAppointment(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -336,7 +330,7 @@ class _ProfessionalsPageState extends State<ProfessionalsPage> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: AppColors.accent.withValues(alpha: isDark ? 0.2 : 0.1),
+                    color: AppColors.accent.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
                   ),
                   child: const Icon(
@@ -353,15 +347,12 @@ class _ProfessionalsPageState extends State<ProfessionalsPage> {
                         'Prossimo Appuntamento',
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: isDark ? AppColors.textPrimaryDark : null,
                             ),
                       ),
                       Text(
                         'Lunedì 23 Dicembre, 10:00',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: isDark
-                                  ? AppColors.textSecondaryDark
-                                  : AppColors.textSecondary,
+                              color: AppColors.textSecondary,
                             ),
                       ),
                     ],
@@ -373,9 +364,7 @@ class _ProfessionalsPageState extends State<ProfessionalsPage> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isDark
-                    ? AppColors.surfaceVariantDark
-                    : AppColors.background,
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
               ),
               child: Row(
@@ -394,15 +383,12 @@ class _ProfessionalsPageState extends State<ProfessionalsPage> {
                           'Alice P.',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                 fontWeight: FontWeight.w600,
-                                color: isDark ? AppColors.textPrimaryDark : null,
                               ),
                         ),
                         Text(
                           'Check-up settimanale',
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: isDark
-                                    ? AppColors.textSecondaryDark
-                                    : AppColors.textSecondary,
+                                color: AppColors.textSecondary,
                               ),
                         ),
                       ],
@@ -440,7 +426,7 @@ class _ProfessionalsPageState extends State<ProfessionalsPage> {
   }
 }
 
-/// Card per un consiglio del giorno - SQUADRATO con NEON GLOW
+/// Card per un consiglio del giorno
 class _DailyTipCard extends StatelessWidget {
   final DailyTip tip;
 
@@ -448,23 +434,19 @@ class _DailyTipCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: 280,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.surfaceDark
-            : tip.color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppTheme.radiusNone), // SQUADRATO
+        color: tip.color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
         border: Border.all(
-          color: tip.color.withValues(alpha: isDark ? 0.6 : 0.3),
+          color: tip.color.withValues(alpha: 0.3),
           width: 1.5,
         ),
-        // NEON GLOW effect
         boxShadow: [
           BoxShadow(
-            color: tip.color.withValues(alpha: isDark ? 0.4 : 0.25),
+            color: tip.color.withValues(alpha: 0.25),
             blurRadius: 16,
             spreadRadius: 0,
             offset: const Offset(0, 4),
@@ -491,9 +473,7 @@ class _DailyTipCard extends StatelessWidget {
           Expanded(
             child: Text(
               tip.content,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: isDark ? AppColors.textPrimaryDark : null,
-                  ),
+              style: Theme.of(context).textTheme.bodySmall,
               maxLines: 4,
               overflow: TextOverflow.ellipsis,
             ),
@@ -502,7 +482,7 @@ class _DailyTipCard extends StatelessWidget {
           Text(
             '— ${tip.author}',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  color: AppColors.textSecondary,
                   fontStyle: FontStyle.italic,
                 ),
           ),
@@ -512,7 +492,7 @@ class _DailyTipCard extends StatelessWidget {
   }
 }
 
-/// Card per un professionista - SQUADRATA
+/// Card per un professionista
 class _ProfessionalCard extends StatelessWidget {
   final Professional professional;
   final VoidCallback? onMessageTap;
@@ -524,15 +504,13 @@ class _ProfessionalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    // SQUADRATA - Container invece di Card
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusNone),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
         border: Border.all(
-          color: isDark ? AppColors.borderDark : AppColors.border,
+          color: AppColors.border,
         ),
       ),
       child: Column(
@@ -588,7 +566,6 @@ class _ProfessionalCard extends StatelessWidget {
                       professional.name,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: isDark ? AppColors.textPrimaryDark : null,
                           ),
                     ),
                     const SizedBox(height: 2),
@@ -613,9 +590,7 @@ class _ProfessionalCard extends StatelessWidget {
                     Text(
                       professional.specialty,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondary,
+                            color: AppColors.textSecondary,
                           ),
                     ),
                     const SizedBox(height: 4),
@@ -631,15 +606,12 @@ class _ProfessionalCard extends StatelessWidget {
                           '${professional.rating}',
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: isDark ? AppColors.textPrimaryDark : null,
                               ),
                         ),
                         Text(
                           ' (${professional.reviewCount} recensioni)',
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: isDark
-                                    ? AppColors.textSecondaryDark
-                                    : AppColors.textSecondary,
+                                color: AppColors.textSecondary,
                               ),
                         ),
                       ],
@@ -652,9 +624,7 @@ class _ProfessionalCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             professional.description,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: isDark ? AppColors.textPrimaryDark : null,
-                ),
+            style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: 16),
           Row(

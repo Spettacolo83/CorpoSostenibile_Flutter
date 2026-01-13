@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../config/routes/app_router.dart';
 import '../../../../config/theme/app_colors.dart';
 import '../../../../config/theme/app_theme.dart';
-import '../../../../config/theme/theme_provider.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../providers/auth_provider.dart';
 
@@ -52,46 +51,34 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final currentTheme = ref.watch(themeProvider);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
       body: Stack(
         children: [
-          // Background gradient tech
-          _buildBackgroundGradient(isDark),
+          // Background gradient
+          _buildBackgroundGradient(),
           // Content
           SafeArea(
-            child: Column(
-              children: [
-                // AppBar custom con theme toggle
-                _buildAppBar(currentTheme),
-                // Form scrollabile
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(AppConstants.largePadding),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const SizedBox(height: 24),
-                        _buildHeader(isDark),
-                        const SizedBox(height: 40),
-                        _buildForm(isDark),
-                        const SizedBox(height: 24),
-                        _buildLoginButton(),
-                        const SizedBox(height: 16),
-                        _buildForgotPassword(),
-                        const SizedBox(height: 32),
-                        _buildDivider(isDark),
-                        const SizedBox(height: 32),
-                        _buildSocialLogin(isDark),
-                        const SizedBox(height: 24),
-                        _buildRegisterLink(isDark),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppConstants.largePadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 48),
+                  _buildHeader(),
+                  const SizedBox(height: 40),
+                  _buildForm(),
+                  const SizedBox(height: 24),
+                  _buildLoginButton(),
+                  const SizedBox(height: 16),
+                  _buildForgotPassword(),
+                  const SizedBox(height: 32),
+                  _buildDivider(),
+                  const SizedBox(height: 32),
+                  _buildSocialLogin(),
+                  const SizedBox(height: 24),
+                  _buildRegisterLink(),
+                ],
+              ),
             ),
           ),
         ],
@@ -99,25 +86,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 
-  /// Gradient background tech
-  Widget _buildBackgroundGradient(bool isDark) {
+  /// Gradient background
+  Widget _buildBackgroundGradient() {
     return Positioned.fill(
       child: DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: isDark
-                ? [
-                    AppColors.backgroundDark,
-                    AppColors.surfaceDark,
-                    AppColors.backgroundDark,
-                  ]
-                : [
-                    AppColors.background,
-                    AppColors.surface,
-                    AppColors.background,
-                  ],
+            colors: [
+              AppColors.background,
+              AppColors.surface,
+              AppColors.background,
+            ],
             stops: const [0.0, 0.5, 1.0],
           ),
         ),
@@ -125,69 +106,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 
-  /// AppBar con theme toggle
-  Widget _buildAppBar(ThemeModeOption currentTheme) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          // Theme Toggle Button
-          PopupMenuButton<ThemeModeOption>(
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
-                ),
-              ),
-              child: Icon(
-                currentTheme.icon,
-                color: AppColors.primary,
-                size: 22,
-              ),
-            ),
-            tooltip: 'Tema: ${currentTheme.label}',
-            onSelected: (mode) => ref.read(themeProvider.notifier).setTheme(mode),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-            ),
-            itemBuilder: (context) => ThemeModeOption.values.map((mode) {
-              final isSelected = mode == currentTheme;
-              return PopupMenuItem<ThemeModeOption>(
-                value: mode,
-                child: Row(
-                  children: [
-                    Icon(
-                      mode.icon,
-                      color: isSelected ? AppColors.primary : null,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      mode.label,
-                      style: TextStyle(
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                        color: isSelected ? AppColors.primary : null,
-                      ),
-                    ),
-                    if (isSelected) ...[
-                      const Spacer(),
-                      const Icon(Icons.check, color: AppColors.primary, size: 18),
-                    ],
-                  ],
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader(bool isDark) {
+  Widget _buildHeader() {
     return Column(
       children: [
         // Logo con glow effect
@@ -197,7 +116,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: isDark ? 0.4 : 0.2),
+                color: AppColors.primary.withValues(alpha: 0.2),
                 blurRadius: 30,
                 spreadRadius: 5,
               ),
@@ -227,14 +146,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         Text(
           'Accedi per continuare il tuo percorso',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: AppColors.textSecondary,
               ),
         ),
       ],
     );
   }
 
-  Widget _buildForm(bool isDark) {
+  Widget _buildForm() {
     return Form(
       key: _formKey,
       child: Column(
@@ -355,7 +274,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 
-  Widget _buildDivider(bool isDark) {
+  Widget _buildDivider() {
     return Row(
       children: [
         Expanded(
@@ -365,7 +284,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               gradient: LinearGradient(
                 colors: [
                   Colors.transparent,
-                  isDark ? AppColors.borderDark : AppColors.border,
+                  AppColors.border,
                 ],
               ),
             ),
@@ -376,7 +295,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           child: Text(
             'oppure',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  color: AppColors.textSecondary,
                 ),
           ),
         ),
@@ -386,7 +305,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  isDark ? AppColors.borderDark : AppColors.border,
+                  AppColors.border,
                   Colors.transparent,
                 ],
               ),
@@ -397,14 +316,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 
-  Widget _buildSocialLogin(bool isDark) {
+  Widget _buildSocialLogin() {
     return Column(
       children: [
         // Google button
         _SocialButton(
           icon: Icons.g_mobiledata,
           label: 'Continua con Google',
-          isDark: isDark,
           onPressed: () {
             // TODO: Implementare login con Google
           },
@@ -414,7 +332,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         _SocialButton(
           icon: Icons.apple,
           label: 'Continua con Apple',
-          isDark: isDark,
           onPressed: () {
             // TODO: Implementare login con Apple
           },
@@ -423,14 +340,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 
-  Widget _buildRegisterLink(bool isDark) {
+  Widget _buildRegisterLink() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           'Non hai un account? ',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: AppColors.textSecondary,
               ),
         ),
         TextButton(
@@ -449,17 +366,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 }
 
-/// Social login button con stile tech
+/// Social login button
 class _SocialButton extends StatelessWidget {
   final IconData icon;
   final String label;
-  final bool isDark;
   final VoidCallback onPressed;
 
   const _SocialButton({
     required this.icon,
     required this.label,
-    required this.isDark,
     required this.onPressed,
   });
 
@@ -470,11 +385,9 @@ class _SocialButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
-          backgroundColor: isDark
-              ? AppColors.surfaceVariantDark.withValues(alpha: 0.5)
-              : AppColors.surfaceVariant,
-          side: BorderSide(
-            color: isDark ? AppColors.borderDark : AppColors.border,
+          backgroundColor: AppColors.surfaceVariant,
+          side: const BorderSide(
+            color: AppColors.border,
             width: 1,
           ),
           shape: RoundedRectangleBorder(
@@ -487,13 +400,13 @@ class _SocialButton extends StatelessWidget {
             Icon(
               icon,
               size: icon == Icons.g_mobiledata ? 28 : 24,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: AppColors.textPrimary,
             ),
             const SizedBox(width: 12),
             Text(
               label,
-              style: TextStyle(
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              style: const TextStyle(
+                color: AppColors.textPrimary,
                 fontWeight: FontWeight.w500,
               ),
             ),

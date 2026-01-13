@@ -114,8 +114,6 @@ class _ProgressPageState extends State<ProgressPage> {
   }
 
   Widget _buildChartSelector(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return SizedBox(
       height: 44,
       child: ListView.separated(
@@ -127,7 +125,6 @@ class _ProgressPageState extends State<ProgressPage> {
           final isSelected = chartType == _selectedChart;
           final chipColor = chartType.color;
 
-          // Chip con bordo neon separato (uniforme visivamente)
           return Container(
             padding: isSelected
                 ? const EdgeInsets.symmetric(horizontal: 3, vertical: 1)
@@ -154,9 +151,7 @@ class _ProgressPageState extends State<ProgressPage> {
                 color: isSelected ? Colors.white : chipColor,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
               ),
-              backgroundColor: isDark
-                  ? AppColors.surfaceVariantDark
-                  : Colors.transparent,
+              backgroundColor: Colors.transparent,
               selectedColor: chipColor,
               side: BorderSide(
                 color: isSelected ? chipColor : chipColor.withValues(alpha: 0.5),
@@ -176,14 +171,12 @@ class _ProgressPageState extends State<ProgressPage> {
   }
 
   Widget _buildSelectedChart(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    // SQUADRATO
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusNone),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
         border: Border.all(
-          color: isDark ? AppColors.borderDark : AppColors.border,
+          color: AppColors.border,
         ),
       ),
       child: Padding(
@@ -522,7 +515,7 @@ class _ProgressPageState extends State<ProgressPage> {
   }
 }
 
-/// Card per mostrare un indicatore di progresso - SQUADRATA
+/// Card per mostrare un indicatore di progresso
 class _ProgressCard extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -542,14 +535,12 @@ class _ProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    // SQUADRATA
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusNone),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
         border: Border.all(
-          color: isDark ? AppColors.borderDark : AppColors.border,
+          color: AppColors.border,
         ),
       ),
       child: Padding(

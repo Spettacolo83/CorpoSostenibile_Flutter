@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'config/routes/app_router.dart';
 import 'config/theme/app_theme.dart';
-import 'config/theme/theme_provider.dart';
 import 'core/constants/app_constants.dart';
 
 void main() async {
@@ -43,16 +42,13 @@ class CorpoSostenibileApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
-    final themeMode = ref.watch(themeProvider);
 
     return MaterialApp.router(
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
 
-      // Configurazione tema
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: themeMode.toThemeMode(),
+      // Tema unico (verrà personalizzato in base ai riferimenti del cliente)
+      theme: AppTheme.appTheme,
 
       // Configurazione routing
       routerConfig: router,

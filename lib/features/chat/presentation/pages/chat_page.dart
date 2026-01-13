@@ -173,7 +173,6 @@ class _ChatContactTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return InkWell(
       onTap: () => _openChat(context),
       child: Padding(
@@ -198,7 +197,6 @@ class _ChatContactTile extends StatelessWidget {
                                 fontWeight: contact.unreadCount > 0
                                     ? FontWeight.bold
                                     : FontWeight.w500,
-                                color: isDark ? AppColors.textPrimaryDark : null,
                               ),
                         ),
                       ),
@@ -408,7 +406,6 @@ class _ChatDetailSheetState extends State<_ChatDetailSheet> {
   }
 
   Widget _buildHeader(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -445,15 +442,14 @@ class _ChatDetailSheetState extends State<_ChatDetailSheet> {
                   widget.contact.name,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: isDark ? AppColors.textPrimaryDark : null,
                       ),
                 ),
                 Text(
                   widget.contact.isOnline ? 'Online' : 'Offline',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: widget.contact.isOnline
-                            ? AppColors.primaryMedium // Verde più scuro, leggibile
-                            : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
+                            ? AppColors.primaryMedium
+                            : AppColors.textSecondary,
                       ),
                 ),
               ],

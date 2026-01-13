@@ -71,27 +71,6 @@ class AppColors {
   static const Color info = Color(0xFF00D4FF);              // Blu Neon
 
   // ═══════════════════════════════════════════════════════════════
-  //                    DARK MODE - Superfici e Sfondi
-  // ═══════════════════════════════════════════════════════════════
-  static const Color backgroundDark = Color(0xFF0C1015);    // Nero con hint blu
-  static const Color surfaceDark = Color(0xFF141A21);       // Superficie rialzata
-  static const Color surfaceVariantDark = Color(0xFF1C242D); // Variante più chiara
-  static const Color surfaceElevatedDark = Color(0xFF242D38); // Superficie elevata
-
-  // ═══════════════════════════════════════════════════════════════
-  //                    DARK MODE - Testi
-  // ═══════════════════════════════════════════════════════════════
-  static const Color textPrimaryDark = Color(0xFFF1F5F9);   // Bianco-grigio
-  static const Color textSecondaryDark = Color(0xFF94A3B8); // Grigio chiaro
-  static const Color textHintDark = Color(0xFF64748B);      // Grigio hint
-
-  // ═══════════════════════════════════════════════════════════════
-  //                    DARK MODE - Divisori e Bordi
-  // ═══════════════════════════════════════════════════════════════
-  static const Color dividerDark = Color(0xFF1E293B);       // Divisore scuro
-  static const Color borderDark = Color(0xFF334155);        // Bordo scuro
-
-  // ═══════════════════════════════════════════════════════════════
   //                    GRADIENTI TECH (per uso in widget)
   // ═══════════════════════════════════════════════════════════════
   static const LinearGradient primaryGradient = LinearGradient(
@@ -122,11 +101,5 @@ class AppColors {
     colors: [neonOrange, neonPink],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-  );
-
-  static const LinearGradient darkSurfaceGradient = LinearGradient(
-    colors: [surfaceDark, backgroundDark],
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
   );
 }

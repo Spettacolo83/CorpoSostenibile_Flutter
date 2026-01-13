@@ -3,128 +3,185 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
 
-/// Configurazione del tema "Biohacking Tech".
-/// Design futuristico con forme squadrate e colori cyber.
+/// Configurazione del tema unico dell'app.
+/// Verrà personalizzato in base ai riferimenti del cliente.
 class AppTheme {
   AppTheme._();
 
   // ═══════════════════════════════════════════════════════════════
-  //                    BORDER RADIUS - Tech Style (Squadrato)
+  //                    BORDER RADIUS
   // ═══════════════════════════════════════════════════════════════
-  static const double radiusNone = 0.0;    // Componenti squadrati
-  static const double radiusSmall = 4.0;   // chips, badges
-  static const double radiusMedium = 6.0;  // buttons, inputs
-  static const double radiusLarge = 8.0;   // cards
-  static const double radiusXL = 12.0;     // modals, sheets
+  static const double radiusNone = 0.0;
+  static const double radiusSmall = 4.0;
+  static const double radiusMedium = 8.0;
+  static const double radiusLarge = 12.0;
+  static const double radiusXL = 16.0;
 
   // ═══════════════════════════════════════════════════════════════
-  //                    BLUR APPBAR - Altezza safe area
+  //                    TEMA UNICO
   // ═══════════════════════════════════════════════════════════════
-  static const double appBarHeight = 56.0;
-
-  /// Tema chiaro
-  static ThemeData get lightTheme {
+  static ThemeData get appTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      colorScheme: const ColorScheme.light(
+      colorScheme: ColorScheme.light(
         primary: AppColors.primary,
         primaryContainer: AppColors.primaryLight,
         secondary: AppColors.secondary,
         secondaryContainer: AppColors.secondaryLight,
         tertiary: AppColors.accent,
-        tertiaryContainer: AppColors.accentLight,
         surface: AppColors.surface,
         surfaceContainerHighest: AppColors.surfaceVariant,
         error: AppColors.error,
-        onPrimary: AppColors.textOnPrimary,
-        onSecondary: AppColors.textOnSecondary,
+        onPrimary: Colors.white,
+        onSecondary: Colors.white,
         onSurface: AppColors.textPrimary,
-        onError: AppColors.textOnPrimary,
+        onError: Colors.white,
         outline: AppColors.border,
         outlineVariant: AppColors.divider,
       ),
       scaffoldBackgroundColor: AppColors.background,
-      textTheme: _buildTextTheme(Brightness.light),
-      appBarTheme: _buildAppBarTheme(Brightness.light),
-      elevatedButtonTheme: _buildElevatedButtonTheme(Brightness.light),
-      outlinedButtonTheme: _buildOutlinedButtonTheme(Brightness.light),
+      textTheme: _buildTextTheme(),
+      appBarTheme: _buildAppBarTheme(),
+      elevatedButtonTheme: _buildElevatedButtonTheme(),
+      outlinedButtonTheme: _buildOutlinedButtonTheme(),
       textButtonTheme: _buildTextButtonTheme(),
-      inputDecorationTheme: _buildInputDecorationTheme(Brightness.light),
-      cardTheme: _buildCardTheme(Brightness.light),
-      bottomNavigationBarTheme: _buildBottomNavTheme(Brightness.light),
-      navigationBarTheme: _buildNavigationBarTheme(Brightness.light),
+      inputDecorationTheme: _buildInputDecorationTheme(),
+      cardTheme: _buildCardTheme(),
+      navigationBarTheme: _buildNavigationBarTheme(),
       dividerTheme: const DividerThemeData(color: AppColors.divider, thickness: 1),
-      chipTheme: _buildChipTheme(Brightness.light),
-      floatingActionButtonTheme: _buildFabTheme(Brightness.light),
-      dialogTheme: _buildDialogTheme(Brightness.light),
-      bottomSheetTheme: _buildBottomSheetTheme(Brightness.light),
-      snackBarTheme: _buildSnackBarTheme(Brightness.light),
+      chipTheme: _buildChipTheme(),
+      floatingActionButtonTheme: _buildFabTheme(),
+      dialogTheme: _buildDialogTheme(),
+      bottomSheetTheme: _buildBottomSheetTheme(),
+      snackBarTheme: _buildSnackBarTheme(),
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.primary,
         linearTrackColor: AppColors.surfaceVariant,
       ),
-      listTileTheme: _buildListTileTheme(Brightness.light),
-    );
-  }
-
-  /// Tema scuro
-  static ThemeData get darkTheme {
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      colorScheme: const ColorScheme.dark(
-        primary: AppColors.primary,
-        primaryContainer: AppColors.primarySurface,
-        secondary: AppColors.secondary,
-        secondaryContainer: AppColors.secondaryDark,
-        tertiary: AppColors.accent,
-        tertiaryContainer: AppColors.accentDark,
-        surface: AppColors.surfaceDark,
-        surfaceContainerHighest: AppColors.surfaceVariantDark,
-        error: AppColors.error,
-        onPrimary: AppColors.textPrimary,
-        onSecondary: AppColors.textPrimaryDark,
-        onSurface: AppColors.textPrimaryDark,
-        onError: AppColors.textOnPrimary,
-        outline: AppColors.borderDark,
-        outlineVariant: AppColors.dividerDark,
-      ),
-      scaffoldBackgroundColor: AppColors.backgroundDark,
-      textTheme: _buildTextTheme(Brightness.dark),
-      appBarTheme: _buildAppBarTheme(Brightness.dark),
-      elevatedButtonTheme: _buildElevatedButtonTheme(Brightness.dark),
-      outlinedButtonTheme: _buildOutlinedButtonTheme(Brightness.dark),
-      textButtonTheme: _buildTextButtonTheme(),
-      inputDecorationTheme: _buildInputDecorationTheme(Brightness.dark),
-      cardTheme: _buildCardTheme(Brightness.dark),
-      bottomNavigationBarTheme: _buildBottomNavTheme(Brightness.dark),
-      navigationBarTheme: _buildNavigationBarTheme(Brightness.dark),
-      dividerTheme: const DividerThemeData(color: AppColors.dividerDark, thickness: 1),
-      chipTheme: _buildChipTheme(Brightness.dark),
-      floatingActionButtonTheme: _buildFabTheme(Brightness.dark),
-      dialogTheme: _buildDialogTheme(Brightness.dark),
-      bottomSheetTheme: _buildBottomSheetTheme(Brightness.dark),
-      snackBarTheme: _buildSnackBarTheme(Brightness.dark),
-      progressIndicatorTheme: ProgressIndicatorThemeData(
-        color: AppColors.primary,
-        linearTrackColor: AppColors.primary.withValues(alpha: 0.2),
-      ),
-      listTileTheme: _buildListTileTheme(Brightness.dark),
+      listTileTheme: _buildListTileTheme(),
     );
   }
 
   // ═══════════════════════════════════════════════════════════════
-  //                    NAVIGATION BAR - Tech Style
+  //                    TEXT THEME
   // ═══════════════════════════════════════════════════════════════
-  static NavigationBarThemeData _buildNavigationBarTheme(Brightness brightness) {
-    final isDark = brightness == Brightness.dark;
+  static TextTheme _buildTextTheme() {
+    return GoogleFonts.poppinsTextTheme().copyWith(
+      displayLarge: GoogleFonts.poppins(
+        fontSize: 32,
+        fontWeight: FontWeight.w700,
+        color: AppColors.textPrimary,
+        letterSpacing: -0.5,
+      ),
+      displayMedium: GoogleFonts.poppins(
+        fontSize: 28,
+        fontWeight: FontWeight.w700,
+        color: AppColors.textPrimary,
+        letterSpacing: -0.25,
+      ),
+      displaySmall: GoogleFonts.poppins(
+        fontSize: 24,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+      ),
+      headlineMedium: GoogleFonts.poppins(
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+      ),
+      headlineSmall: GoogleFonts.poppins(
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+      ),
+      titleLarge: GoogleFonts.poppins(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+        letterSpacing: 0.15,
+      ),
+      titleMedium: GoogleFonts.poppins(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+        letterSpacing: 0.1,
+      ),
+      titleSmall: GoogleFonts.poppins(
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+        letterSpacing: 0.1,
+      ),
+      bodyLarge: GoogleFonts.poppins(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        color: AppColors.textPrimary,
+      ),
+      bodyMedium: GoogleFonts.poppins(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        color: AppColors.textPrimary,
+      ),
+      bodySmall: GoogleFonts.poppins(
+        fontSize: 12,
+        fontWeight: FontWeight.w400,
+        color: AppColors.textSecondary,
+      ),
+      labelLarge: GoogleFonts.poppins(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+        letterSpacing: 0.5,
+      ),
+      labelMedium: GoogleFonts.poppins(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+        letterSpacing: 0.5,
+      ),
+      labelSmall: GoogleFonts.poppins(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        color: AppColors.textSecondary,
+        letterSpacing: 0.5,
+      ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //                    APP BAR
+  // ═══════════════════════════════════════════════════════════════
+  static AppBarTheme _buildAppBarTheme() {
+    return AppBarTheme(
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      centerTitle: true,
+      backgroundColor: Colors.transparent,
+      foregroundColor: AppColors.textPrimary,
+      surfaceTintColor: Colors.transparent,
+      titleTextStyle: GoogleFonts.poppins(
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+      ),
+      iconTheme: const IconThemeData(
+        color: AppColors.textPrimary,
+        size: 24,
+      ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //                    NAVIGATION BAR
+  // ═══════════════════════════════════════════════════════════════
+  static NavigationBarThemeData _buildNavigationBarTheme() {
     return NavigationBarThemeData(
       height: 72,
       elevation: 0,
-      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+      backgroundColor: AppColors.surface,
       surfaceTintColor: Colors.transparent,
-      indicatorColor: AppColors.primary.withValues(alpha: isDark ? 0.25 : 0.15),
+      indicatorColor: AppColors.primary.withValues(alpha: 0.15),
       indicatorShape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radiusMedium),
       ),
@@ -132,10 +189,7 @@ class AppTheme {
         if (states.contains(WidgetState.selected)) {
           return const IconThemeData(color: AppColors.primary, size: 24);
         }
-        return IconThemeData(
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-          size: 24,
-        );
+        return const IconThemeData(color: AppColors.textSecondary, size: 24);
       }),
       labelTextStyle: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
@@ -148,141 +202,23 @@ class AppTheme {
         return GoogleFonts.poppins(
           fontSize: 12,
           fontWeight: FontWeight.w500,
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: AppColors.textSecondary,
         );
       }),
     );
   }
 
   // ═══════════════════════════════════════════════════════════════
-  //                    TEXT THEME - Modern Typography
+  //                    ELEVATED BUTTON
   // ═══════════════════════════════════════════════════════════════
-  static TextTheme _buildTextTheme(Brightness brightness) {
-    final baseColor = brightness == Brightness.light
-        ? AppColors.textPrimary
-        : AppColors.textPrimaryDark;
-
-    return GoogleFonts.poppinsTextTheme().copyWith(
-      displayLarge: GoogleFonts.poppins(
-        fontSize: 32,
-        fontWeight: FontWeight.w700,
-        color: baseColor,
-        letterSpacing: -0.5,
-      ),
-      displayMedium: GoogleFonts.poppins(
-        fontSize: 28,
-        fontWeight: FontWeight.w700,
-        color: baseColor,
-        letterSpacing: -0.25,
-      ),
-      displaySmall: GoogleFonts.poppins(
-        fontSize: 24,
-        fontWeight: FontWeight.w600,
-        color: baseColor,
-      ),
-      headlineMedium: GoogleFonts.poppins(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        color: baseColor,
-      ),
-      headlineSmall: GoogleFonts.poppins(
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-        color: baseColor,
-      ),
-      titleLarge: GoogleFonts.poppins(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        color: baseColor,
-        letterSpacing: 0.15,
-      ),
-      titleMedium: GoogleFonts.poppins(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: baseColor,
-        letterSpacing: 0.1,
-      ),
-      titleSmall: GoogleFonts.poppins(
-        fontSize: 13,
-        fontWeight: FontWeight.w600,
-        color: baseColor,
-        letterSpacing: 0.1,
-      ),
-      bodyLarge: GoogleFonts.poppins(
-        fontSize: 16,
-        fontWeight: FontWeight.w400,
-        color: baseColor,
-      ),
-      bodyMedium: GoogleFonts.poppins(
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
-        color: baseColor,
-      ),
-      bodySmall: GoogleFonts.poppins(
-        fontSize: 12,
-        fontWeight: FontWeight.w400,
-        color: brightness == Brightness.light
-            ? AppColors.textSecondary
-            : AppColors.textSecondaryDark,
-      ),
-      labelLarge: GoogleFonts.poppins(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: baseColor,
-        letterSpacing: 0.5,
-      ),
-      labelMedium: GoogleFonts.poppins(
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
-        color: baseColor,
-        letterSpacing: 0.5,
-      ),
-      labelSmall: GoogleFonts.poppins(
-        fontSize: 11,
-        fontWeight: FontWeight.w500,
-        color: brightness == Brightness.light
-            ? AppColors.textSecondary
-            : AppColors.textSecondaryDark,
-        letterSpacing: 0.5,
-      ),
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  //                    APP BAR - Trasparente (blur applicato nel widget)
-  // ═══════════════════════════════════════════════════════════════
-  static AppBarTheme _buildAppBarTheme(Brightness brightness) {
-    final isDark = brightness == Brightness.dark;
-    return AppBarTheme(
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      centerTitle: true,
-      backgroundColor: Colors.transparent,
-      foregroundColor: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-      surfaceTintColor: Colors.transparent,
-      titleTextStyle: GoogleFonts.poppins(
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-      ),
-      iconTheme: IconThemeData(
-        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-        size: 24,
-      ),
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  //                    ELEVATED BUTTON - Tech Style
-  // ═══════════════════════════════════════════════════════════════
-  static ElevatedButtonThemeData _buildElevatedButtonTheme(Brightness brightness) {
+  static ElevatedButtonThemeData _buildElevatedButtonTheme() {
     return ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         elevation: 0,
         backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.textPrimary,
+        foregroundColor: Colors.white,
         disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
-        disabledForegroundColor: AppColors.textPrimary.withValues(alpha: 0.5),
+        disabledForegroundColor: Colors.white.withValues(alpha: 0.5),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
         minimumSize: const Size(double.infinity, 52),
         shape: RoundedRectangleBorder(
@@ -298,19 +234,15 @@ class AppTheme {
   }
 
   // ═══════════════════════════════════════════════════════════════
-  //                    OUTLINED BUTTON - Tech Border Style
+  //                    OUTLINED BUTTON
   // ═══════════════════════════════════════════════════════════════
-  static OutlinedButtonThemeData _buildOutlinedButtonTheme(Brightness brightness) {
-    final isDark = brightness == Brightness.dark;
+  static OutlinedButtonThemeData _buildOutlinedButtonTheme() {
     return OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: AppColors.primary,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
         minimumSize: const Size(double.infinity, 52),
-        side: BorderSide(
-          color: isDark ? AppColors.borderDark : AppColors.border,
-          width: 1.5,
-        ),
+        side: const BorderSide(color: AppColors.border, width: 1.5),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusMedium),
         ),
@@ -339,24 +271,20 @@ class AppTheme {
   }
 
   // ═══════════════════════════════════════════════════════════════
-  //                    INPUT DECORATION - Tech Fields
+  //                    INPUT DECORATION
   // ═══════════════════════════════════════════════════════════════
-  static InputDecorationTheme _buildInputDecorationTheme(Brightness brightness) {
-    final isDark = brightness == Brightness.dark;
-    final fillColor = isDark ? AppColors.surfaceVariantDark : AppColors.surfaceVariant;
-    final borderColor = isDark ? AppColors.borderDark : AppColors.border;
-
+  static InputDecorationTheme _buildInputDecorationTheme() {
     return InputDecorationTheme(
       filled: true,
-      fillColor: fillColor,
+      fillColor: AppColors.surfaceVariant,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(radiusMedium),
-        borderSide: BorderSide(color: borderColor, width: 1),
+        borderSide: const BorderSide(color: AppColors.border, width: 1),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(radiusMedium),
-        borderSide: BorderSide(color: borderColor, width: 1),
+        borderSide: const BorderSide(color: AppColors.border, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(radiusMedium),
@@ -371,73 +299,46 @@ class AppTheme {
         borderSide: const BorderSide(color: AppColors.error, width: 2),
       ),
       hintStyle: GoogleFonts.poppins(
-        color: isDark ? AppColors.textHintDark : AppColors.textHint,
+        color: AppColors.textHint,
         fontSize: 14,
       ),
       labelStyle: GoogleFonts.poppins(
-        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+        color: AppColors.textSecondary,
         fontSize: 14,
       ),
-      prefixIconColor: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-      suffixIconColor: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+      prefixIconColor: AppColors.textSecondary,
+      suffixIconColor: AppColors.textSecondary,
     );
   }
 
   // ═══════════════════════════════════════════════════════════════
-  //                    CARD - Tech Surface
+  //                    CARD
   // ═══════════════════════════════════════════════════════════════
-  static CardTheme _buildCardTheme(Brightness brightness) {
-    final isDark = brightness == Brightness.dark;
+  static CardTheme _buildCardTheme() {
     return CardTheme(
       elevation: 0,
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: AppColors.surface,
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radiusLarge),
-        side: BorderSide(
-          color: isDark ? AppColors.borderDark : AppColors.divider,
-          width: 1,
-        ),
+        side: const BorderSide(color: AppColors.divider, width: 1),
       ),
       margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 6),
     );
   }
 
   // ═══════════════════════════════════════════════════════════════
-  //                    BOTTOM NAV - Legacy Support
+  //                    CHIP
   // ═══════════════════════════════════════════════════════════════
-  static BottomNavigationBarThemeData _buildBottomNavTheme(Brightness brightness) {
-    final isDark = brightness == Brightness.dark;
-    return BottomNavigationBarThemeData(
-      type: BottomNavigationBarType.fixed,
-      elevation: 0,
-      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
-      selectedItemColor: AppColors.primary,
-      unselectedItemColor: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-      selectedLabelStyle: GoogleFonts.poppins(
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
-      ),
-      unselectedLabelStyle: GoogleFonts.poppins(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-      ),
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  //                    CHIP - Tech Tags
-  // ═══════════════════════════════════════════════════════════════
-  static ChipThemeData _buildChipTheme(Brightness brightness) {
-    final isDark = brightness == Brightness.dark;
+  static ChipThemeData _buildChipTheme() {
     return ChipThemeData(
-      backgroundColor: isDark ? AppColors.surfaceVariantDark : AppColors.surfaceVariant,
+      backgroundColor: AppColors.surfaceVariant,
       selectedColor: AppColors.primary.withValues(alpha: 0.2),
-      disabledColor: isDark ? AppColors.surfaceVariantDark : AppColors.surfaceVariant,
+      disabledColor: AppColors.surfaceVariant,
       labelStyle: GoogleFonts.poppins(
         fontSize: 13,
         fontWeight: FontWeight.w500,
-        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+        color: AppColors.textPrimary,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       shape: RoundedRectangleBorder(
@@ -448,12 +349,12 @@ class AppTheme {
   }
 
   // ═══════════════════════════════════════════════════════════════
-  //                    FAB - Floating Action Button
+  //                    FAB
   // ═══════════════════════════════════════════════════════════════
-  static FloatingActionButtonThemeData _buildFabTheme(Brightness brightness) {
+  static FloatingActionButtonThemeData _buildFabTheme() {
     return FloatingActionButtonThemeData(
       backgroundColor: AppColors.primary,
-      foregroundColor: AppColors.textPrimary,
+      foregroundColor: Colors.white,
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radiusMedium),
@@ -462,60 +363,54 @@ class AppTheme {
   }
 
   // ═══════════════════════════════════════════════════════════════
-  //                    DIALOG - Tech Modal
+  //                    DIALOG
   // ═══════════════════════════════════════════════════════════════
-  static DialogTheme _buildDialogTheme(Brightness brightness) {
-    final isDark = brightness == Brightness.dark;
+  static DialogTheme _buildDialogTheme() {
     return DialogTheme(
-      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+      backgroundColor: AppColors.surface,
       elevation: 0,
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radiusLarge),
-        side: BorderSide(
-          color: isDark ? AppColors.borderDark : AppColors.divider,
-          width: 1,
-        ),
+        side: const BorderSide(color: AppColors.divider, width: 1),
       ),
       titleTextStyle: GoogleFonts.poppins(
         fontSize: 18,
         fontWeight: FontWeight.w600,
-        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+        color: AppColors.textPrimary,
       ),
       contentTextStyle: GoogleFonts.poppins(
         fontSize: 14,
-        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+        color: AppColors.textSecondary,
       ),
     );
   }
 
   // ═══════════════════════════════════════════════════════════════
-  //                    BOTTOM SHEET - Tech Panel
+  //                    BOTTOM SHEET
   // ═══════════════════════════════════════════════════════════════
-  static BottomSheetThemeData _buildBottomSheetTheme(Brightness brightness) {
-    final isDark = brightness == Brightness.dark;
+  static BottomSheetThemeData _buildBottomSheetTheme() {
     return BottomSheetThemeData(
-      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+      backgroundColor: AppColors.surface,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(radiusXL)),
       ),
-      dragHandleColor: isDark ? AppColors.borderDark : AppColors.border,
+      dragHandleColor: AppColors.border,
       dragHandleSize: const Size(40, 4),
     );
   }
 
   // ═══════════════════════════════════════════════════════════════
-  //                    SNACKBAR - Tech Notification
+  //                    SNACKBAR
   // ═══════════════════════════════════════════════════════════════
-  static SnackBarThemeData _buildSnackBarTheme(Brightness brightness) {
-    final isDark = brightness == Brightness.dark;
+  static SnackBarThemeData _buildSnackBarTheme() {
     return SnackBarThemeData(
-      backgroundColor: isDark ? AppColors.surfaceElevatedDark : AppColors.textPrimary,
+      backgroundColor: AppColors.textPrimary,
       contentTextStyle: GoogleFonts.poppins(
         fontSize: 14,
-        color: isDark ? AppColors.textPrimaryDark : AppColors.surface,
+        color: AppColors.surface,
       ),
       actionTextColor: AppColors.primary,
       behavior: SnackBarBehavior.floating,
@@ -527,10 +422,9 @@ class AppTheme {
   }
 
   // ═══════════════════════════════════════════════════════════════
-  //                    LIST TILE - Tech Row
+  //                    LIST TILE
   // ═══════════════════════════════════════════════════════════════
-  static ListTileThemeData _buildListTileTheme(Brightness brightness) {
-    final isDark = brightness == Brightness.dark;
+  static ListTileThemeData _buildListTileTheme() {
     return ListTileThemeData(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       tileColor: Colors.transparent,
@@ -540,13 +434,13 @@ class AppTheme {
       titleTextStyle: GoogleFonts.poppins(
         fontSize: 15,
         fontWeight: FontWeight.w500,
-        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+        color: AppColors.textPrimary,
       ),
       subtitleTextStyle: GoogleFonts.poppins(
         fontSize: 13,
-        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+        color: AppColors.textSecondary,
       ),
-      iconColor: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+      iconColor: AppColors.textSecondary,
     );
   }
 }
