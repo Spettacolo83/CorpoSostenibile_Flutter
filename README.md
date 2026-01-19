@@ -32,42 +32,34 @@ L'app adotta un **design "Biohacking Tech"** che unisce il mondo del benessere a
 - **Chat con Professionisti** - Comunicazione diretta con nutrizionisti e coach
 - **Assistente AI Integrato** - Chatbot intelligente per supporto immediato
 - **Profilo Utente** - Gestione dati personali e preferenze
-- **Tema Chiaro/Scuro** - Supporto completo per entrambe le modalità
 
 ---
 
 ## Screenshots
 
-L'app supporta sia **Light Mode** che **Dark Mode**. Di seguito alcuni screenshot dalle versioni Android (Dark Mode) e iOS (Light Mode).
-
-### Android (Dark Mode)
-
 <p align="center">
-  <img src="docs/screenshots/android_login.png" width="180" alt="Login Android"/>
-  <img src="docs/screenshots/android_home.png" width="180" alt="Home Android"/>
-  <img src="docs/screenshots/android_progresso.png" width="180" alt="Progresso Android"/>
-  <img src="docs/screenshots/android_chat.png" width="180" alt="Chat Android"/>
+  <img src="docs/screenshots/splash.png" width="180" alt="Splash"/>
+  <img src="docs/screenshots/home.png" width="180" alt="Home"/>
+  <img src="docs/screenshots/home_2.png" width="180" alt="Home 2"/>
+  <img src="docs/screenshots/progresso.png" width="180" alt="Progresso"/>
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/android_team.png" width="180" alt="Team Android"/>
-  <img src="docs/screenshots/android_profilo.png" width="180" alt="Profilo Android"/>
-  <img src="docs/screenshots/android_chatbotia.png" width="180" alt="Chatbot AI Android"/>
-</p>
-
-### iOS (Light Mode)
-
-<p align="center">
-  <img src="docs/screenshots/ios_login.png" width="180" alt="Login iOS"/>
-  <img src="docs/screenshots/ios_home.png" width="180" alt="Home iOS"/>
-  <img src="docs/screenshots/ios_progresso.png" width="180" alt="Progresso iOS"/>
-  <img src="docs/screenshots/ios_chat.png" width="180" alt="Chat iOS"/>
+  <img src="docs/screenshots/progresso_2.png" width="180" alt="Progresso 2"/>
+  <img src="docs/screenshots/chat.png" width="180" alt="Chat"/>
+  <img src="docs/screenshots/chat_2.png" width="180" alt="Chat 2"/>
+  <img src="docs/screenshots/team.png" width="180" alt="Team"/>
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/ios_team.png" width="180" alt="Team iOS"/>
-  <img src="docs/screenshots/ios_profilo.png" width="180" alt="Profilo iOS"/>
-  <img src="docs/screenshots/ios_chatbotia.png" width="180" alt="Chatbot AI iOS"/>
+  <img src="docs/screenshots/team_2.png" width="180" alt="Team 2"/>
+  <img src="docs/screenshots/team_3.png" width="180" alt="Team 3"/>
+  <img src="docs/screenshots/chatbotia.png" width="180" alt="Chatbot AI"/>
+  <img src="docs/screenshots/chatbotia_2.png" width="180" alt="Chatbot AI 2"/>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/profilo.png" width="180" alt="Profilo"/>
 </p>
 
 ---
@@ -109,7 +101,7 @@ L'obiettivo è trasmettere che **Corpo Sostenibile non è solo un centro di nutr
 - Il glow effect simula **schermi OLED e interfacce high-tech**
 - Comunica **energia e dinamismo** — l'opposto del wellness "zen" tradizionale
 - Differenzia il brand dalla concorrenza che usa palette naturali/organiche
-- In dark mode, i neon risaltano come **dati su un monitor medico**
+- I neon risaltano come **dati su un monitor medico**
 
 #### 3. Forme Angolari (Meno Arrotondate)
 
@@ -556,11 +548,10 @@ L'app utilizza un design system **"Biohacking Tech"** basato su Material 3 con p
 | **Neon Blue** | `#00D4FF` | AI, tecnologia | Affidabilità, innovazione |
 | **Neon Orange** | `#FF6B35` | CTA, warning | Azione, metabolismo |
 | **Neon Purple** | `#BF40BF` | Premium, mindfulness | Mistero, trasformazione |
-| **Background Dark** | `#0D1F1A` | Sfondo dark mode | Profondità, focus |
 
 ### Filosofia dei Colori
 
-I colori neon su sfondo scuro:
+I colori neon:
 - Evocano **interfacce sci-fi** e dashboard mediche
 - Creano **contrasto elevato** per leggibilità
 - Comunicano **energia e innovazione**
@@ -585,14 +576,13 @@ I colori neon su sfondo scuro:
 
 - **Font principale**: Poppins (Google Fonts) — Geometrico, moderno
 - **Font secondario**: Quicksand — Splash screen, logo
-- Supporto completo per tema chiaro/scuro
 
 ---
 
 ## Roadmap
 
 - [x] Setup progetto e architettura Clean
-- [x] Configurazione tema e design system (Light/Dark)
+- [x] Configurazione tema e design system
 - [x] Splash screen con animazione logo
 - [x] Sistema di autenticazione (UI)
 - [x] Home page con dashboard interattiva
