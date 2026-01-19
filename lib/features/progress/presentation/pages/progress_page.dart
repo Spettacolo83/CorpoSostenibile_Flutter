@@ -3,14 +3,17 @@ import 'package:flutter/material.dart';
 import '../../../../config/theme/app_colors.dart';
 import '../../../../config/theme/app_theme.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/widgets/circular_progress_ring.dart';
+import '../../../../core/widgets/glassmorphic_card.dart';
+import '../../../../core/widgets/stat_card.dart';
 
-/// Tipo di grafico disponibile - Colori NEON tech
+/// Tipo di grafico disponibile
 enum ChartType {
   weight('Peso', 'kg', Icons.monitor_weight, AppColors.primary),
-  sleep('Sonno', 'ore', Icons.nightlight_round, AppColors.neonBlue),
-  bodyMass('Massa', '%', Icons.accessibility_new, AppColors.neonOrange),
-  hydration('Idratazione', 'L', Icons.water_drop, AppColors.neonPurple),
-  calories('Calorie', 'kcal', Icons.local_fire_department, AppColors.neonRed);
+  sleep('Sonno', 'ore', Icons.nightlight_round, AppColors.ringSleep),
+  bodyMass('Massa', '%', Icons.accessibility_new, AppColors.chartOrange),
+  hydration('Idratazione', 'L', Icons.water_drop, AppColors.ringWater),
+  calories('Calorie', 'kcal', Icons.local_fire_department, AppColors.ringCalories);
 
   final String label;
   final String unit;
@@ -20,7 +23,7 @@ enum ChartType {
   const ChartType(this.label, this.unit, this.icon, this.color);
 }
 
-/// Pagina Progresso - Mostra i grafici di avanzamento dell'utente.
+/// Pagina Progresso - Design "Modern Fitness" con circular rings.
 class ProgressPage extends StatefulWidget {
   final String? scrollTarget;
   final VoidCallback? onScrollComplete;
@@ -35,15 +38,36 @@ class ProgressPage extends StatefulWidget {
   State<ProgressPage> createState() => _ProgressPageState();
 }
 
-class _ProgressPageState extends State<ProgressPage> {
+class _ProgressPageState extends State<ProgressPage>
+    with SingleTickerProviderStateMixin {
   ChartType _selectedChart = ChartType.weight;
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _wellnessKey = GlobalKey();
 
+  late AnimationController _animationController;
+  late Animation<double> _progressAnimation;
+
   @override
   void initState() {
     super.initState();
+    _setupAnimations();
     _scrollToTargetIfNeeded();
+  }
+
+  void _setupAnimations() {
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+
+    _progressAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeOutCubic,
+      ),
+    );
+
+    _animationController.forward();
   }
 
   @override
@@ -62,7 +86,6 @@ class _ProgressPageState extends State<ProgressPage> {
       if (!mounted) return;
 
       if (widget.scrollTarget == 'wellness') {
-        // Scorri fino a "Il Tuo Benessere"
         final context = _wellnessKey.currentContext;
         if (context != null) {
           Scrollable.ensureVisible(
@@ -79,37 +102,255 @@ class _ProgressPageState extends State<ProgressPage> {
 
   @override
   void dispose() {
+    _animationController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Top padding ridotto: solo safe area + piccolo gap
     final topInset = MediaQuery.of(context).padding.top + 12;
 
-    return SingleChildScrollView(
-      controller: _scrollController,
-      padding: EdgeInsets.only(
-        top: topInset,
-        left: AppConstants.defaultPadding,
-        right: AppConstants.defaultPadding,
-        bottom: AppConstants.defaultPadding,
+    return Stack(
+      children: [
+        // Gradient background per header
+        _buildHeaderGradient(context),
+        // Content
+        SingleChildScrollView(
+          controller: _scrollController,
+          padding: EdgeInsets.only(
+            top: topInset,
+            left: AppConstants.defaultPadding,
+            right: AppConstants.defaultPadding,
+            bottom: AppConstants.defaultPadding + 80,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(context),
+              const SizedBox(height: 24),
+              _buildMainRings(context),
+              const SizedBox(height: 24),
+              _buildChartSection(context),
+              const SizedBox(height: 24),
+              _buildQuickStats(context),
+              const SizedBox(height: 24),
+              _buildWellnessSection(context),
+              const SizedBox(height: 24),
+              _buildWeeklyInsights(context),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeaderGradient(BuildContext context) {
+    return Container(
+      height: 280,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.primary.withValues(alpha: 0.15),
+            AppColors.secondary.withValues(alpha: 0.05),
+            Colors.transparent,
+          ],
+          stops: const [0.0, 0.5, 1.0],
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildChartSelector(context),
-          const SizedBox(height: 16),
-          _buildSelectedChart(context),
-          const SizedBox(height: 24),
-          _buildSyncCard(context),
-          const SizedBox(height: 24),
-          _buildProgressGrid(context),
-          const SizedBox(height: 24),
-          _buildWeeklyStats(context),
-        ],
-      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'I Tuoi Progressi',
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: AppColors.textPrimary,
+              ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Traccia il tuo percorso verso il benessere',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.textSecondary,
+              ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMainRings(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _progressAnimation,
+      builder: (context, child) {
+        final progress = _progressAnimation.value;
+        return GlassmorphicCard(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              // 3 Anelli principali in fila
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildAnimatedRing(
+                    progress: 0.64 * progress,
+                    value: '${(320 * progress).toInt()}',
+                    label: 'Calorie',
+                    unit: 'kcal',
+                    color: AppColors.ringCalories,
+                    size: 90,
+                  ),
+                  _buildAnimatedRing(
+                    progress: 0.75 * progress,
+                    value: '${(1.5 * progress).toStringAsFixed(1)}',
+                    label: 'Acqua',
+                    unit: 'L',
+                    color: AppColors.ringWater,
+                    size: 90,
+                  ),
+                  _buildAnimatedRing(
+                    progress: 0.83 * progress,
+                    value: '${(25 * progress).toInt()}',
+                    label: 'Attività',
+                    unit: 'min',
+                    color: AppColors.ringActivity,
+                    size: 90,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              // Summary row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildMiniStat(
+                    Icons.local_fire_department,
+                    '500',
+                    'Obiettivo',
+                    AppColors.ringCalories,
+                  ),
+                  _buildMiniStat(
+                    Icons.water_drop,
+                    '2.0L',
+                    'Obiettivo',
+                    AppColors.ringWater,
+                  ),
+                  _buildMiniStat(
+                    Icons.directions_run,
+                    '30',
+                    'Obiettivo',
+                    AppColors.ringActivity,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildAnimatedRing({
+    required double progress,
+    required String value,
+    required String label,
+    required String unit,
+    required Color color,
+    required double size,
+  }) {
+    return Column(
+      children: [
+        CircularProgressRing(
+          progress: progress,
+          size: size,
+          color: color,
+          strokeWidth: 10,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              Text(
+                unit,
+                style: TextStyle(
+                  fontSize: 10,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: color,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMiniStat(IconData icon, String value, String label, Color color) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, size: 16, color: color),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            color: AppColors.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildChartSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Andamento',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+        ),
+        const SizedBox(height: 12),
+        _buildChartSelector(context),
+        const SizedBox(height: 16),
+        _buildSelectedChart(context),
+      ],
     );
   }
 
@@ -123,46 +364,55 @@ class _ProgressPageState extends State<ProgressPage> {
         itemBuilder: (context, index) {
           final chartType = ChartType.values[index];
           final isSelected = chartType == _selectedChart;
-          final chipColor = chartType.color;
 
-          return Container(
-            padding: isSelected
-                ? const EdgeInsets.symmetric(horizontal: 3, vertical: 1)
-                : EdgeInsets.zero,
-            decoration: isSelected
-                ? BoxDecoration(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSmall + 3),
-                    border: Border.all(
-                      color: chipColor.withValues(alpha: 0.7),
-                      width: 1.5,
+          return GestureDetector(
+            onTap: () => setState(() => _selectedChart = chartType),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                gradient: isSelected
+                    ? LinearGradient(
+                        colors: [
+                          chartType.color,
+                          chartType.color.withValues(alpha: 0.8),
+                        ],
+                      )
+                    : null,
+                color: isSelected ? null : AppColors.surface,
+                borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+                border: isSelected
+                    ? null
+                    : Border.all(color: AppColors.border),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: chartType.color.withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    chartType.icon,
+                    size: 18,
+                    color: isSelected ? Colors.white : chartType.color,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    chartType.label,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: isSelected ? Colors.white : chartType.color,
                     ),
-                  )
-                : null,
-            child: FilterChip(
-              selected: isSelected,
-              showCheckmark: false,
-              avatar: Icon(
-                chartType.icon,
-                size: 18,
-                color: isSelected ? Colors.white : chipColor,
+                  ),
+                ],
               ),
-              label: Text(chartType.label),
-              labelStyle: TextStyle(
-                color: isSelected ? Colors.white : chipColor,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-              ),
-              backgroundColor: Colors.transparent,
-              selectedColor: chipColor,
-              side: BorderSide(
-                color: isSelected ? chipColor : chipColor.withValues(alpha: 0.5),
-                width: isSelected ? 0 : 1.5,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-              ),
-              onSelected: (_) {
-                setState(() => _selectedChart = chartType);
-              },
             ),
           );
         },
@@ -171,74 +421,84 @@ class _ProgressPageState extends State<ProgressPage> {
   }
 
   Widget _buildSelectedChart(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-        border: Border.all(
-          color: AppColors.border,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Andamento ${_selectedChart.label}',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                _buildChartBadge(context),
-              ],
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              height: 180,
-              child: CustomPaint(
-                size: const Size(double.infinity, 180),
-                painter: _ChartPainter(chartType: _selectedChart),
+    return GlassmorphicCard(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Ultimi 7 giorni',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Andamento ${_selectedChart.label}',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ],
               ),
+              _buildChartBadge(context),
+            ],
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            height: 180,
+            child: CustomPaint(
+              size: const Size(double.infinity, 180),
+              painter: _ModernChartPainter(chartType: _selectedChart),
             ),
-            const SizedBox(height: 16),
-            _buildChartStats(context),
-          ],
-        ),
+          ),
+          const SizedBox(height: 16),
+          _buildChartStats(context),
+        ],
       ),
     );
   }
 
   Widget _buildChartBadge(BuildContext context) {
-    // Badge info - usa il colore del chart selezionato
     final badges = {
-      ChartType.weight: ('-4.2 kg', Icons.trending_down),
-      ChartType.sleep: ('+0.5h', Icons.trending_up),
-      ChartType.bodyMass: ('-2.3%', Icons.trending_down),
-      ChartType.hydration: ('+0.3L', Icons.trending_up),
-      ChartType.calories: ('-150', Icons.trending_down),
+      ChartType.weight: ('-4.2 kg', Icons.trending_down, true),
+      ChartType.sleep: ('+0.5h', Icons.trending_up, false),
+      ChartType.bodyMass: ('-2.3%', Icons.trending_down, true),
+      ChartType.hydration: ('+0.3L', Icons.trending_up, false),
+      ChartType.calories: ('-150', Icons.trending_down, true),
     };
 
-    final (value, icon) = badges[_selectedChart]!;
-    final color = _selectedChart.color; // Usa il colore del chart!
+    final (value, icon, isPositive) = badges[_selectedChart]!;
+    final color = _selectedChart.color;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        gradient: LinearGradient(
+          colors: [
+            color.withValues(alpha: 0.2),
+            color.withValues(alpha: 0.1),
+          ],
+        ),
         borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+        border: Border.all(
+          color: color.withValues(alpha: 0.3),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color, size: 16),
-          const SizedBox(width: 4),
+          Icon(icon, color: color, size: 18),
+          const SizedBox(width: 6),
           Text(
             value,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: color,
                   fontWeight: FontWeight.bold,
                 ),
@@ -283,100 +543,123 @@ class _ProgressPageState extends State<ProgressPage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: currentStats.asMap().entries.map((entry) {
         final (label, value) = entry.value;
-        final color = entry.key == 1 ? AppColors.primary : AppColors.textSecondary;
+        final isHighlight = entry.key == 1;
 
-        return Column(
-          children: [
-            Text(
-              label,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-          ],
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: isHighlight
+              ? BoxDecoration(
+                  color: _selectedChart.color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                )
+              : null,
+          child: Column(
+            children: [
+              Text(
+                label,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: isHighlight
+                          ? _selectedChart.color
+                          : AppColors.textPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ],
+          ),
         );
       }).toList(),
     );
   }
 
-  Widget _buildSyncCard(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
+  Widget _buildQuickStats(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.info.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-              ),
-              child: const Icon(
-                Icons.watch,
-                color: AppColors.info,
-                size: 28,
-              ),
+            Text(
+              'Quick Stats',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Smartwatch Sincronizzato',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Apple Watch • Ultimo sync: 5 min fa',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                  ),
-                ],
+            TextButton(
+              onPressed: () {},
+              child: Text(
+                'Vedi tutto',
+                style: TextStyle(color: AppColors.primary),
               ),
-            ),
-            IconButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Sincronizzazione in corso...'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.sync, color: AppColors.primary),
             ),
           ],
         ),
-      ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 160,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: [
+              StatCard(
+                icon: Icons.monitor_weight,
+                value: '78.3',
+                label: 'Peso (kg)',
+                trend: -2.5,
+                color: AppColors.primary,
+              ),
+              const SizedBox(width: 12),
+              StatCard(
+                icon: Icons.favorite,
+                value: '68',
+                label: 'BPM Riposo',
+                trend: -3.0,
+                color: AppColors.ringCalories,
+              ),
+              const SizedBox(width: 12),
+              StatCard(
+                icon: Icons.directions_walk,
+                value: '8,432',
+                label: 'Passi oggi',
+                trend: 12.0,
+                color: AppColors.ringActivity,
+              ),
+              const SizedBox(width: 12),
+              StatCard(
+                icon: Icons.accessibility_new,
+                value: '26.2',
+                label: 'BMI',
+                trend: -1.5,
+                color: AppColors.chartOrange,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildProgressGrid(BuildContext context) {
+  Widget _buildWellnessSection(BuildContext context) {
     return Column(
       key: _wellnessKey,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Il Tuo Benessere',
-          style: Theme.of(context).textTheme.titleLarge,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
         ),
         const SizedBox(height: 12),
         Row(
           children: [
             Expanded(
-              child: _ProgressCard(
+              child: _WellnessCard(
                 icon: Icons.restaurant,
                 title: 'Fame',
                 value: '3.2',
@@ -387,12 +670,12 @@ class _ProgressPageState extends State<ProgressPage> {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: _ProgressCard(
+              child: _WellnessCard(
                 icon: Icons.nightlight_round,
                 title: 'Sonno',
                 value: '7.5h',
                 subtitle: 'Media settimanale',
-                color: AppColors.info,
+                color: AppColors.ringSleep,
                 progress: 0.75,
               ),
             ),
@@ -402,24 +685,24 @@ class _ProgressPageState extends State<ProgressPage> {
         Row(
           children: [
             Expanded(
-              child: _ProgressCard(
-                icon: Icons.local_fire_department,
-                title: 'Calorie',
-                value: '1,850',
-                subtitle: 'kcal oggi',
-                color: const Color(0xFFE57373),
-                progress: 0.85,
+              child: _WellnessCard(
+                icon: Icons.emoji_emotions,
+                title: 'Stress',
+                value: '4.2',
+                subtitle: 'su 10 • Moderato',
+                color: AppColors.chartOrange,
+                progress: 0.42,
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: _ProgressCard(
-                icon: Icons.directions_walk,
-                title: 'Passi',
-                value: '8,432',
-                subtitle: 'Obiettivo: 10,000',
-                color: AppColors.neonPurple, // Viola neon
-                progress: 0.84,
+              child: _WellnessCard(
+                icon: Icons.battery_charging_full,
+                title: 'Energia',
+                value: '7.8',
+                subtitle: 'su 10 • Ottima',
+                color: AppColors.ringActivity,
+                progress: 0.78,
               ),
             ),
           ],
@@ -428,62 +711,69 @@ class _ProgressPageState extends State<ProgressPage> {
     );
   }
 
-  Widget _buildWeeklyStats(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Riepilogo Settimanale',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 16),
-            _buildStatRow(
-              context,
-              Icons.emoji_emotions,
-              'Umore medio',
-              'Buono',
-              AppColors.success,
-            ),
-            const Divider(height: 24),
-            _buildStatRow(
-              context,
-              Icons.water_drop,
-              'Idratazione',
-              '2.1L / giorno',
-              AppColors.info,
-            ),
-            const Divider(height: 24),
-            _buildStatRow(
-              context,
-              Icons.fitness_center,
-              'Allenamenti',
-              '4 sessioni',
-              const Color(0xFFE57373),
-            ),
-            const Divider(height: 24),
-            _buildStatRow(
-              context,
-              Icons.self_improvement,
-              'Mindfulness',
-              '35 min totali',
-              AppColors.neonPurple, // Viola neon
-            ),
-          ],
-        ),
+  Widget _buildWeeklyInsights(BuildContext context) {
+    return GlassmorphicCard(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: AppColors.primaryGradient,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.insights,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Insights Settimanali',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          _buildInsightRow(
+            context,
+            Icons.trending_up,
+            'Ottimo progresso!',
+            'Hai perso 0.5 kg questa settimana',
+            AppColors.success,
+          ),
+          const SizedBox(height: 12),
+          _buildInsightRow(
+            context,
+            Icons.water_drop,
+            'Idratazione migliorata',
+            'Media aumentata del 15% rispetto alla scorsa settimana',
+            AppColors.ringWater,
+          ),
+          const SizedBox(height: 12),
+          _buildInsightRow(
+            context,
+            Icons.nightlight_round,
+            'Qualità sonno',
+            'Cerca di dormire almeno 30 min in più',
+            AppColors.ringSleep,
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildStatRow(
+  Widget _buildInsightRow(
     BuildContext context,
     IconData icon,
-    String label,
-    String value,
+    String title,
+    String subtitle,
     Color color,
   ) {
     return Row(
@@ -498,25 +788,31 @@ class _ProgressPageState extends State<ProgressPage> {
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: Text(
-            label,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-        ),
-        Text(
-          value,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: color,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
               ),
+              Text(
+                subtitle,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
 }
 
-/// Card per mostrare un indicatore di progresso
-class _ProgressCard extends StatelessWidget {
+/// Card Wellness con circular progress
+class _WellnessCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String value;
@@ -524,7 +820,7 @@ class _ProgressCard extends StatelessWidget {
   final Color color;
   final double progress;
 
-  const _ProgressCard({
+  const _WellnessCard({
     required this.icon,
     required this.title,
     required this.value,
@@ -535,87 +831,78 @@ class _ProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-        border: Border.all(
-          color: AppColors.border,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(icon, color: color, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
+    return GlassmorphicCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              value,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              subtitle,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-            ),
-            const SizedBox(height: 12),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: progress,
-                backgroundColor: color.withValues(alpha: 0.2),
-                valueColor: AlwaysStoppedAnimation<Color>(color),
-                minHeight: 6,
+                child: Icon(icon, color: color, size: 18),
               ),
-            ),
-          ],
-        ),
+              const SizedBox(width: 10),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      value,
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: color,
+                          ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              CircularProgressRing(
+                progress: progress,
+                size: 48,
+                color: color,
+                strokeWidth: 5,
+                showGlow: false,
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
 
-/// Painter per i grafici
-class _ChartPainter extends CustomPainter {
+/// Painter per i grafici moderni con curve smooth
+class _ModernChartPainter extends CustomPainter {
   final ChartType chartType;
 
-  _ChartPainter({required this.chartType});
+  _ModernChartPainter({required this.chartType});
 
   @override
   void paint(Canvas canvas, Size size) {
     final chartColor = chartType.color;
-
-    final paint = Paint()
-      ..color = chartColor
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    final fillPaint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          chartColor.withValues(alpha: 0.3),
-          chartColor.withValues(alpha: 0.0),
-        ],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
 
     // Dati dummy per ogni tipo di grafico
     final dataMap = {
@@ -638,59 +925,128 @@ class _ChartPainter extends CustomPainter {
     final (minVal, maxVal) = rangeMap[chartType]!;
     final range = maxVal - minVal;
 
-    final path = Path();
-    final fillPath = Path();
-
+    // Calcola i punti
+    final points = <Offset>[];
     for (var i = 0; i < data.length; i++) {
       final x = (size.width / (data.length - 1)) * i;
       final y = size.height - ((data[i] - minVal) / range * size.height);
+      points.add(Offset(x, y));
+    }
 
-      if (i == 0) {
-        path.moveTo(x, y);
-        fillPath.moveTo(x, size.height);
-        fillPath.lineTo(x, y);
-      } else {
-        path.lineTo(x, y);
-        fillPath.lineTo(x, y);
-      }
+    // Disegna griglia orizzontale sfumata
+    final gridPaint = Paint()
+      ..color = AppColors.textSecondary.withValues(alpha: 0.1)
+      ..strokeWidth = 1;
+
+    for (var i = 0; i <= 4; i++) {
+      final y = (size.height / 4) * i;
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
+    }
+
+    // Crea path curvo usando Bezier
+    final path = Path();
+    final fillPath = Path();
+
+    path.moveTo(points[0].dx, points[0].dy);
+    fillPath.moveTo(0, size.height);
+    fillPath.lineTo(points[0].dx, points[0].dy);
+
+    for (var i = 0; i < points.length - 1; i++) {
+      final p0 = points[i];
+      final p1 = points[i + 1];
+
+      final controlPoint1 = Offset(
+        p0.dx + (p1.dx - p0.dx) / 2,
+        p0.dy,
+      );
+      final controlPoint2 = Offset(
+        p0.dx + (p1.dx - p0.dx) / 2,
+        p1.dy,
+      );
+
+      path.cubicTo(
+        controlPoint1.dx,
+        controlPoint1.dy,
+        controlPoint2.dx,
+        controlPoint2.dy,
+        p1.dx,
+        p1.dy,
+      );
+      fillPath.cubicTo(
+        controlPoint1.dx,
+        controlPoint1.dy,
+        controlPoint2.dx,
+        controlPoint2.dy,
+        p1.dx,
+        p1.dy,
+      );
     }
 
     fillPath.lineTo(size.width, size.height);
     fillPath.close();
 
-    // Disegna griglia
-    final gridPaint = Paint()
-      ..color = AppColors.textSecondary.withValues(alpha: 0.2)
-      ..strokeWidth = 1;
+    // Gradient fill
+    final fillPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          chartColor.withValues(alpha: 0.3),
+          chartColor.withValues(alpha: 0.05),
+          chartColor.withValues(alpha: 0.0),
+        ],
+        stops: const [0.0, 0.5, 1.0],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
 
-    for (var i = 0; i < 4; i++) {
-      final y = size.height / 3 * i;
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
-    }
-
-    // Disegna riempimento e linea
     canvas.drawPath(fillPath, fillPaint);
-    canvas.drawPath(path, paint);
+
+    // Linea principale con glow
+    final glowPaint = Paint()
+      ..color = chartColor.withValues(alpha: 0.3)
+      ..strokeWidth = 8
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+
+    canvas.drawPath(path, glowPaint);
+
+    final linePaint = Paint()
+      ..color = chartColor
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawPath(path, linePaint);
 
     // Disegna punti
-    final dotPaint = Paint()
-      ..color = chartColor
-      ..style = PaintingStyle.fill;
+    for (var i = 0; i < points.length; i++) {
+      final isLast = i == points.length - 1;
 
-    final dotBorderPaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
+      // Outer glow for last point
+      if (isLast) {
+        final glowPaint = Paint()
+          ..color = chartColor.withValues(alpha: 0.3)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+        canvas.drawCircle(points[i], 12, glowPaint);
+      }
 
-    for (var i = 0; i < data.length; i++) {
-      final x = (size.width / (data.length - 1)) * i;
-      final y = size.height - ((data[i] - minVal) / range * size.height);
+      // White border
+      canvas.drawCircle(
+        points[i],
+        isLast ? 8 : 5,
+        Paint()..color = Colors.white,
+      );
 
-      canvas.drawCircle(Offset(x, y), 6, dotBorderPaint);
-      canvas.drawCircle(Offset(x, y), 4, dotPaint);
+      // Colored center
+      canvas.drawCircle(
+        points[i],
+        isLast ? 6 : 3.5,
+        Paint()..color = chartColor,
+      );
     }
   }
 
   @override
-  bool shouldRepaint(covariant _ChartPainter oldDelegate) =>
+  bool shouldRepaint(covariant _ModernChartPainter oldDelegate) =>
       oldDelegate.chartType != chartType;
 }

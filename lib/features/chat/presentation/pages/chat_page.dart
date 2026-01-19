@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import '../../../../config/theme/app_colors.dart';
@@ -27,9 +29,8 @@ class ChatContact {
   });
 }
 
-/// Pagina Chat - Lista dei contatti e conversazioni.
+/// Pagina Chat - Design "Modern Fitness" con glassmorphism.
 class ChatPage extends StatefulWidget {
-  /// Nome del contatto da aprire automaticamente (opzionale)
   final String? initialContactName;
 
   const ChatPage({super.key, this.initialContactName});
@@ -60,7 +61,7 @@ class ChatPage extends StatefulWidget {
       lastMessage: 'Come ti sei sentito questa settimana con il nuovo approccio?',
       time: 'Ieri',
       unreadCount: 1,
-      roleColor: AppColors.neonPurple, // Viola neon
+      roleColor: AppColors.chartPurple,
       avatarPath: 'assets/images/delia_avatar.png',
     ),
     ChatContact(
@@ -88,7 +89,6 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void didUpdateWidget(ChatPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Se il contatto iniziale è cambiato, apri la nuova chat
     if (widget.initialContactName != oldWidget.initialContactName &&
         widget.initialContactName != null) {
       _hasOpenedInitialChat = false;
@@ -100,13 +100,11 @@ class _ChatPageState extends State<ChatPage> {
     if (_hasOpenedInitialChat || widget.initialContactName == null) return;
     _hasOpenedInitialChat = true;
 
-    // Cerca il contatto corrispondente
     final contact = ChatPage.contacts.where(
       (c) => c.name == widget.initialContactName,
     ).firstOrNull;
 
     if (contact != null) {
-      // Apri la chat dopo il frame corrente
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           showModalBottomSheet(
@@ -122,45 +120,244 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Top padding ridotto: solo safe area + piccolo gap
     final topInset = MediaQuery.of(context).padding.top + 12;
 
-    return Column(
+    return Stack(
       children: [
-        SizedBox(height: topInset),
-        _buildSearchBar(context),
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            itemCount: ChatPage.contacts.length,
-            itemBuilder: (context, index) {
-              return _ChatContactTile(contact: ChatPage.contacts[index]);
-            },
+        // Header gradient
+        Container(
+          height: 180,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.primary.withValues(alpha: 0.1),
+                AppColors.secondary.withValues(alpha: 0.05),
+                Colors.transparent,
+              ],
+            ),
           ),
+        ),
+        Column(
+          children: [
+            SizedBox(height: topInset),
+            _buildHeader(context),
+            const SizedBox(height: 16),
+            _buildSearchBar(context),
+            const SizedBox(height: 8),
+            _buildOnlineNow(context),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemCount: ChatPage.contacts.length,
+                itemBuilder: (context, index) {
+                  return _ChatContactTile(contact: ChatPage.contacts[index]);
+                },
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 
-  Widget _buildSearchBar(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppConstants.defaultPadding),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: 'Cerca conversazione...',
-          prefixIcon: const Icon(Icons.search),
-          filled: true,
-          fillColor: Theme.of(context).cardColor,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-            borderSide: BorderSide.none,
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppConstants.defaultPadding),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Messaggi',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+              Text(
+                '${ChatPage.contacts.where((c) => c.unreadCount > 0).length} non letti',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+              ),
+            ],
           ),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 12,
+          Container(
+            decoration: BoxDecoration(
+              gradient: AppColors.primaryGradient,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.edit_outlined, color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppConstants.defaultPadding),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.surface.withValues(alpha: 0.8),
+              borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Cerca conversazione...',
+                hintStyle: TextStyle(color: AppColors.textSecondary),
+                prefixIcon: Icon(Icons.search, color: AppColors.textSecondary),
+                filled: false,
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+              ),
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildOnlineNow(BuildContext context) {
+    final onlineContacts = ChatPage.contacts.where((c) => c.isOnline).toList();
+    if (onlineContacts.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppConstants.defaultPadding),
+          child: Text(
+            'Online ora',
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 90,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: AppConstants.defaultPadding),
+            itemCount: onlineContacts.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 16),
+            itemBuilder: (context, index) {
+              final contact = onlineContacts[index];
+              return _OnlineAvatar(contact: contact);
+            },
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+}
+
+/// Avatar online con animazione
+class _OnlineAvatar extends StatelessWidget {
+  final ChatContact contact;
+
+  const _OnlineAvatar({required this.contact});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _openChat(context),
+      child: Column(
+        children: [
+          Stack(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [
+                      contact.roleColor,
+                      contact.roleColor.withValues(alpha: 0.6),
+                    ],
+                  ),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+                  child: CircleAvatar(
+                    radius: 28,
+                    backgroundColor: contact.roleColor.withValues(alpha: 0.2),
+                    backgroundImage: contact.avatarPath != null
+                        ? AssetImage(contact.avatarPath!)
+                        : null,
+                    child: contact.avatarPath == null
+                        ? Text(
+                            contact.name.split(' ').map((e) => e[0]).take(2).join(),
+                            style: TextStyle(
+                              color: contact.roleColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        : null,
+                  ),
+                ),
+              ),
+              Positioned(
+                right: 4,
+                bottom: 4,
+                child: Container(
+                  width: 14,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: AppColors.success,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            contact.name.split(' ').first,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openChat(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _ChatDetailSheet(contact: contact),
     );
   }
 }
@@ -173,106 +370,128 @@ class _ChatContactTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () => _openChat(context),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppConstants.defaultPadding,
-          vertical: 12,
-        ),
-        child: Row(
-          children: [
-            _buildAvatar(),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          contact.name,
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                fontWeight: contact.unreadCount > 0
-                                    ? FontWeight.bold
-                                    : FontWeight.w500,
-                              ),
-                        ),
-                      ),
-                      Text(
-                        contact.time,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: contact.unreadCount > 0
-                                  ? AppColors.primary
-                                  : AppColors.textSecondary,
-                            ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 2),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: contact.roleColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      contact.role,
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: contact.roleColor,
-                            fontWeight: FontWeight.w500,
-                          ),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          contact.lastMessage,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: contact.unreadCount > 0
-                                    ? Theme.of(context).textTheme.bodyMedium?.color
-                                    : AppColors.textSecondary,
-                                fontWeight: contact.unreadCount > 0
-                                    ? FontWeight.w500
-                                    : null,
-                              ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (contact.unreadCount > 0) ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+    return Container(
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppConstants.defaultPadding,
+        vertical: 4,
+      ),
+      decoration: BoxDecoration(
+        color: contact.unreadCount > 0
+            ? AppColors.primary.withValues(alpha: 0.05)
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+      ),
+      child: InkWell(
+        onTap: () => _openChat(context),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              _buildAvatar(),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
                           child: Text(
-                            '${contact.unreadCount}',
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+                            contact.name,
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                  fontWeight: contact.unreadCount > 0
+                                      ? FontWeight.bold
+                                      : FontWeight.w500,
                                 ),
                           ),
                         ),
+                        Text(
+                          contact.time,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: contact.unreadCount > 0
+                                    ? AppColors.primary
+                                    : AppColors.textSecondary,
+                                fontWeight: contact.unreadCount > 0
+                                    ? FontWeight.w600
+                                    : null,
+                              ),
+                        ),
                       ],
-                    ],
-                  ),
-                ],
+                    ),
+                    const SizedBox(height: 4),
+                    _buildRoleBadge(context),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            contact.lastMessage,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: contact.unreadCount > 0
+                                      ? AppColors.textPrimary
+                                      : AppColors.textSecondary,
+                                  fontWeight: contact.unreadCount > 0
+                                      ? FontWeight.w500
+                                      : null,
+                                ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (contact.unreadCount > 0) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: AppColors.primaryGradient,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '${contact.unreadCount}',
+                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRoleBadge(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            contact.roleColor.withValues(alpha: 0.15),
+            contact.roleColor.withValues(alpha: 0.05),
           ],
         ),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: contact.roleColor.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Text(
+        contact.role,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: contact.roleColor,
+              fontWeight: FontWeight.w600,
+            ),
       ),
     );
   }
@@ -280,22 +499,34 @@ class _ChatContactTile extends StatelessWidget {
   Widget _buildAvatar() {
     return Stack(
       children: [
-        CircleAvatar(
-          radius: 28,
-          backgroundColor: contact.roleColor.withValues(alpha: 0.2),
-          backgroundImage: contact.avatarPath != null
-              ? AssetImage(contact.avatarPath!)
-              : null,
-          child: contact.avatarPath == null
-              ? Text(
-                  contact.name.split(' ').map((e) => e[0]).take(2).join(),
-                  style: TextStyle(
-                    color: contact.roleColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                )
-              : null,
+        Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: contact.roleColor.withValues(alpha: 0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: CircleAvatar(
+            radius: 28,
+            backgroundColor: contact.roleColor.withValues(alpha: 0.2),
+            backgroundImage: contact.avatarPath != null
+                ? AssetImage(contact.avatarPath!)
+                : null,
+            child: contact.avatarPath == null
+                ? Text(
+                    contact.name.split(' ').map((e) => e[0]).take(2).join(),
+                    style: TextStyle(
+                      color: contact.roleColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  )
+                : null,
+          ),
         ),
         if (contact.isOnline)
           Positioned(
@@ -308,6 +539,12 @@ class _ChatContactTile extends StatelessWidget {
                 color: AppColors.success,
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.success.withValues(alpha: 0.5),
+                    blurRadius: 4,
+                  ),
+                ],
               ),
             ),
           ),
@@ -381,10 +618,20 @@ class _ChatDetailSheetState extends State<_ChatDetailSheet> {
         height: MediaQuery.of(context).size.height * 0.85,
         decoration: BoxDecoration(
           color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           children: [
+            // Handle bar
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.textSecondary.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             _buildHeader(context),
             Expanded(
               child: ListView.builder(
@@ -408,30 +655,40 @@ class _ChatDetailSheetState extends State<_ChatDetailSheet> {
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      ),
       child: Row(
         children: [
           IconButton(
             onPressed: () => Navigator.pop(context),
+            style: IconButton.styleFrom(
+              backgroundColor: AppColors.surface,
+            ),
             icon: const Icon(Icons.arrow_back),
           ),
-          CircleAvatar(
-            backgroundColor: widget.contact.roleColor.withValues(alpha: 0.2),
-            backgroundImage: widget.contact.avatarPath != null
-                ? AssetImage(widget.contact.avatarPath!)
-                : null,
-            child: widget.contact.avatarPath == null
-                ? Text(
-                    widget.contact.name.split(' ').map((e) => e[0]).take(2).join(),
-                    style: TextStyle(
-                      color: widget.contact.roleColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-                : null,
+          const SizedBox(width: 12),
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: widget.contact.roleColor.withValues(alpha: 0.3),
+                width: 2,
+              ),
+            ),
+            child: CircleAvatar(
+              radius: 22,
+              backgroundColor: widget.contact.roleColor.withValues(alpha: 0.2),
+              backgroundImage: widget.contact.avatarPath != null
+                  ? AssetImage(widget.contact.avatarPath!)
+                  : null,
+              child: widget.contact.avatarPath == null
+                  ? Text(
+                      widget.contact.name.split(' ').map((e) => e[0]).take(2).join(),
+                      style: TextStyle(
+                        color: widget.contact.roleColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  : null,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -440,28 +697,56 @@ class _ChatDetailSheetState extends State<_ChatDetailSheet> {
               children: [
                 Text(
                   widget.contact.name,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                 ),
-                Text(
-                  widget.contact.isOnline ? 'Online' : 'Offline',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
                         color: widget.contact.isOnline
-                            ? AppColors.primaryMedium
+                            ? AppColors.success
                             : AppColors.textSecondary,
+                        shape: BoxShape.circle,
                       ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      widget.contact.isOnline ? 'Online' : 'Offline',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: widget.contact.isOnline
+                                ? AppColors.success
+                                : AppColors.textSecondary,
+                          ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.videocam_outlined),
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.videocam_outlined, color: widget.contact.roleColor),
+            ),
           ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.call_outlined),
+          const SizedBox(width: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.call_outlined, color: widget.contact.roleColor),
+            ),
           ),
         ],
       ),
@@ -469,63 +754,87 @@ class _ChatDetailSheetState extends State<_ChatDetailSheet> {
   }
 
   Widget _buildMessageInput(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 12,
-        bottom: MediaQuery.of(context).padding.bottom + 12,
-      ),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 12,
+            bottom: MediaQuery.of(context).padding.bottom + 12,
           ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.attach_file),
+          decoration: BoxDecoration(
+            color: AppColors.surface.withValues(alpha: 0.9),
+            border: Border(
+              top: BorderSide(color: AppColors.border),
+            ),
           ),
-          Expanded(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 120),
-              child: TextField(
-                controller: _messageController,
-                maxLines: null,
-                minLines: 1,
-                textInputAction: TextInputAction.newline,
-                decoration: InputDecoration(
-                  hintText: 'Scrivi un messaggio...',
-                  filled: true,
-                  fillColor: Theme.of(context).scaffoldBackgroundColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 10,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: IconButton(
+                  onPressed: () {},
+                  icon: Icon(Icons.attach_file, color: AppColors.textSecondary),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 120),
+                  child: TextField(
+                    controller: _messageController,
+                    maxLines: null,
+                    minLines: 1,
+                    textInputAction: TextInputAction.newline,
+                    decoration: InputDecoration(
+                      hintText: 'Scrivi un messaggio...',
+                      hintStyle: TextStyle(color: AppColors.textSecondary),
+                      filled: true,
+                      fillColor: AppColors.background,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+              const SizedBox(width: 12),
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      widget.contact.roleColor,
+                      widget.contact.roleColor.withValues(alpha: 0.8),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: widget.contact.roleColor.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: IconButton(
+                  onPressed: _sendMessage,
+                  icon: const Icon(Icons.send, color: Colors.white, size: 20),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 8),
-          CircleAvatar(
-            backgroundColor: widget.contact.roleColor,
-            child: IconButton(
-              onPressed: _sendMessage,
-              icon: const Icon(Icons.send, color: Colors.white, size: 20),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -542,7 +851,6 @@ class _ChatDetailSheetState extends State<_ChatDetailSheet> {
     });
     _messageController.clear();
 
-    // Simula risposta automatica
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         setState(() {
@@ -570,7 +878,7 @@ class _ChatMessage {
   });
 }
 
-/// Bolla di messaggio
+/// Bolla di messaggio moderna
 class _MessageBubble extends StatelessWidget {
   final _ChatMessage message;
   final Color myMessageColor;
@@ -585,39 +893,55 @@ class _MessageBubble extends StatelessWidget {
     return Align(
       alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: message.isMe
-              ? myMessageColor
-              : Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMedium).copyWith(
-            bottomRight: message.isMe ? const Radius.circular(4) : null,
-            bottomLeft: !message.isMe ? const Radius.circular(4) : null,
-          ),
-        ),
+        margin: const EdgeInsets.only(bottom: 12),
         constraints: BoxConstraints(
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              message.text,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: message.isMe ? Colors.white : null,
-                  ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              message.time,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: message.isMe
-                        ? Colors.white.withValues(alpha: 0.7)
-                        : AppColors.textSecondary,
-                  ),
+        decoration: BoxDecoration(
+          gradient: message.isMe
+              ? LinearGradient(
+                  colors: [
+                    myMessageColor,
+                    myMessageColor.withValues(alpha: 0.85),
+                  ],
+                )
+              : null,
+          color: message.isMe ? null : AppColors.surface,
+          borderRadius: BorderRadius.circular(20).copyWith(
+            bottomRight: message.isMe ? const Radius.circular(4) : null,
+            bottomLeft: !message.isMe ? const Radius.circular(4) : null,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: (message.isMe ? myMessageColor : Colors.black)
+                  .withValues(alpha: 0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
           ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                message.text,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: message.isMe ? Colors.white : AppColors.textPrimary,
+                    ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                message.time,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: message.isMe
+                          ? Colors.white.withValues(alpha: 0.7)
+                          : AppColors.textSecondary,
+                    ),
+              ),
+            ],
+          ),
         ),
       ),
     );

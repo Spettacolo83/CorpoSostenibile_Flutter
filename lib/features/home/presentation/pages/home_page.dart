@@ -9,6 +9,8 @@ import '../../../../config/routes/app_router.dart';
 import '../../../../config/theme/app_colors.dart';
 import '../../../../config/theme/app_theme.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/models/user_progress.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/ai_chat_provider.dart';
 import '../../../chat/presentation/pages/chat_page.dart';
@@ -17,7 +19,7 @@ import '../../../professionals/presentation/pages/professionals_page.dart'
 import '../../../progress/presentation/pages/progress_page.dart';
 
 /// Pagina principale dell'applicazione.
-/// Mostra la dashboard con le funzionalità principali.
+/// Design "Modern Fitness" - futuristico con glassmorphism e gamification.
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
@@ -188,7 +190,7 @@ abstract class _TabIndex {
   static const int team = 3;
 }
 
-/// Vista Dashboard con panoramica del percorso utente
+/// Vista Dashboard NUOVA - Modern Fitness con glassmorphism e gamification
 class _DashboardView extends StatelessWidget {
   final String firstName;
   final void Function(int tabIndex) onNavigateToTab;
@@ -206,206 +208,358 @@ class _DashboardView extends StatelessWidget {
     required this.onNavigateToPlan,
   });
 
+  // Demo data - in produzione verrebbe dal provider
+  UserProgress get _demoProgress => DemoUserProgress.sample;
+
   @override
   Widget build(BuildContext context) {
-    // Top padding ridotto: solo safe area + piccolo gap
-    final topInset = MediaQuery.of(context).padding.top + 12;
+    final topInset = MediaQuery.of(context).padding.top + kToolbarHeight - 30;
 
     return SingleChildScrollView(
       padding: EdgeInsets.only(
         top: topInset,
-        left: AppConstants.defaultPadding,
-        right: AppConstants.defaultPadding,
         bottom: AppConstants.defaultPadding,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildGreetingCard(context, firstName),
-          const SizedBox(height: 24),
-          _buildQuickActions(context),
-          const SizedBox(height: 24),
-          _buildProgressSection(context),
-          const SizedBox(height: 24),
-          _buildRecentActivities(context),
+          // 1. HERO CARD con streak
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: _buildHeroSection(context),
+          ),
+          const SizedBox(height: 28),
+
+          // 2. CIRCULAR PROGRESS RINGS
+          _buildProgressRings(context),
+          const SizedBox(height: 28),
+
+          // 3. TODAY'S WORKOUT CARD
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: _buildTodayWorkout(context),
+          ),
+          const SizedBox(height: 28),
+
+          // 4. QUICK STATS (horizontal scroll)
+          _buildQuickStats(context),
+          const SizedBox(height: 28),
+
+          // 5. ACHIEVEMENTS (horizontal scroll)
+          _buildAchievements(context),
+          const SizedBox(height: 28),
+
+          // 6. RECENT ACTIVITIES
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: _buildRecentActivities(context),
+          ),
+          const SizedBox(height: 16),
         ],
       ),
     );
   }
 
-  Widget _buildGreetingCard(BuildContext context, String name) {
-    final greeting = name.isNotEmpty ? 'Ciao, $name!' : 'Ciao!';
+  Widget _buildHeroSection(BuildContext context) {
+    final greeting = _getGreeting();
+    final name = firstName.isNotEmpty ? firstName : 'Utente';
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: AppColors.primaryGradient,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-        border: Border.all(
-          color: AppColors.accent.withValues(alpha: 0.3),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.25),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              // Avatar con bordo tech
-              Container(
-                padding: const EdgeInsets.all(3),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.5),
-                    width: 2,
-                  ),
-                ),
-                child: CircleAvatar(
-                  radius: 26,
-                  backgroundColor: Colors.white.withValues(alpha: 0.15),
-                  child: const Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: 28,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      greeting,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Continua il tuo percorso di benessere',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.white.withValues(alpha: 0.85),
-                          ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+    return HeroStreakCard(
+      greeting: greeting,
+      userName: name,
+      streakDays: _demoProgress.currentStreak,
+      motivationalText: _getMotivationalText(),
     );
   }
 
-  Widget _buildQuickActions(BuildContext context) {
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Buongiorno';
+    if (hour < 18) return 'Buon pomeriggio';
+    return 'Buonasera';
+  }
+
+  String _getMotivationalText() {
+    final streak = _demoProgress.currentStreak;
+    if (streak >= 30) return 'Incredibile! Un mese di costanza!';
+    if (streak >= 14) return 'Due settimane di fuoco! Continua cosi!';
+    if (streak >= 7) return 'Una settimana perfetta!';
+    if (streak >= 3) return 'Ottimo inizio! Mantieni il ritmo!';
+    return 'Continua il tuo percorso di benessere';
+  }
+
+  Widget _buildProgressRings(BuildContext context) {
+    final goals = _demoProgress.dailyGoals;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Azioni Rapide',
-          style: Theme.of(context).textTheme.titleLarge,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Obiettivi di Oggi',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+              TextButton(
+                onPressed: () => onNavigateToTab(1),
+                child: const Text('Dettagli'),
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.calendar_today,
-                title: 'Appuntamenti',
-                color: AppColors.secondary, // Viola tech
-                onTap: onNavigateToAppointments,
-                isSquared: true, // SQUADRATO
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 160,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            children: [
+              _buildRingCard(
+                context,
+                progress: goals.caloriesProgress,
+                color: AppColors.ringCalories,
+                icon: Icons.local_fire_department,
+                value: '${goals.caloriesBurned.toInt()}',
+                label: 'Calorie',
+                target: '/${goals.caloriesTarget.toInt()} kcal',
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.menu_book,
-                title: 'Piano Alimentare',
-                color: AppColors.primary, // Verde primary leggibile
-                onTap: onNavigateToPlan,
-                isSquared: false, // ARROTONDATO
+              const SizedBox(width: 16),
+              _buildRingCard(
+                context,
+                progress: goals.waterProgress,
+                color: AppColors.ringWater,
+                icon: Icons.water_drop,
+                value: goals.waterConsumed.toStringAsFixed(1),
+                label: 'Acqua',
+                target: '/${goals.waterTarget.toStringAsFixed(1)} L',
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.chat_bubble_outline,
-                title: 'Messaggi',
-                color: AppColors.info,
-                onTap: onNavigateToChat,
-                isSquared: false, // ARROTONDATO
+              const SizedBox(width: 16),
+              _buildRingCard(
+                context,
+                progress: goals.activityProgress,
+                color: AppColors.ringActivity,
+                icon: Icons.directions_run,
+                value: '${goals.activityMinutes}',
+                label: 'Attività',
+                target: '/${goals.activityTarget} min',
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _QuickActionCard(
-                icon: Icons.article_outlined,
-                title: 'Risorse',
-                color: AppColors.neonOrange, // NEON!
-                onTap: onNavigateToResources,
-                isSquared: true, // SQUADRATO
+              const SizedBox(width: 16),
+              _buildRingCard(
+                context,
+                progress: goals.sleepProgress,
+                color: AppColors.ringSleep,
+                icon: Icons.nightlight_round,
+                value: goals.sleepHours.toStringAsFixed(1),
+                label: 'Sonno',
+                target: '/${goals.sleepTarget.toStringAsFixed(0)} ore',
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildProgressSection(BuildContext context) {
+  Widget _buildRingCard(
+    BuildContext context, {
+    required double progress,
+    required Color color,
+    required IconData icon,
+    required String value,
+    required String label,
+    required String target,
+  }) {
+    return Container(
+      width: 130,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusXL),
+        border: Border.all(color: AppColors.divider),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.1),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressRing(
+            progress: progress,
+            size: 70,
+            color: color,
+            strokeWidth: 8,
+            centerIcon: icon,
+          ),
+          const SizedBox(height: 12),
+          RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
+              style: Theme.of(context).textTheme.bodySmall,
+              children: [
+                TextSpan(
+                  text: value,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                    fontSize: 16,
+                  ),
+                ),
+                TextSpan(
+                  text: target,
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: AppColors.textHint,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTodayWorkout(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'I tuoi Progressi',
-          style: Theme.of(context).textTheme.titleLarge,
+          'Il tuo Workout di Oggi',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
         ),
-        const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-            border: Border.all(
-              color: AppColors.divider,
-              width: 1,
-            ),
+        const SizedBox(height: 16),
+        HeroWorkoutCard(
+          workoutName: 'Full Body Energizzante',
+          duration: '25 minuti',
+          difficulty: 'Intermedio',
+          difficultyColor: AppColors.warning,
+          icon: Icons.fitness_center,
+          onStart: onNavigateToPlan,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickStats(BuildContext context) {
+    final weekly = _demoProgress.weeklyStats;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            'Statistiche Rapide',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
           ),
-          child: Column(
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 160,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             children: [
-              _ProgressIndicator(
-                label: 'Obiettivo settimanale',
-                progress: 0.7,
-                color: AppColors.neonOrange, // NEON!
+              StatCard(
+                icon: Icons.fitness_center,
+                value: '${weekly.workoutsThisWeek}/${weekly.workoutsGoal}',
+                label: 'Workout settimana',
+                trend: 12.5,
+                color: AppColors.primary,
               ),
-              const SizedBox(height: 16),
-              _ProgressIndicator(
-                label: 'Piano alimentare',
-                progress: 0.85,
-                color: AppColors.primary, // Verde primary leggibile
+              const SizedBox(width: 12),
+              StatCard(
+                icon: Icons.monitor_weight,
+                value: '${weekly.weightChange > 0 ? '+' : ''}${weekly.weightChange.toStringAsFixed(1)} kg',
+                label: 'Peso settimana',
+                trend: weekly.weightChange * -10,
+                color: AppColors.secondary,
               ),
-              const SizedBox(height: 16),
-              _ProgressIndicator(
-                label: 'Idratazione',
-                progress: 0.6,
-                color: AppColors.info,
+              const SizedBox(width: 12),
+              StatCard(
+                icon: Icons.star,
+                value: '${_demoProgress.totalXP}',
+                label: 'XP Totali',
+                trend: 8.3,
+                color: AppColors.gold,
+              ),
+              const SizedBox(width: 12),
+              StatCard(
+                icon: Icons.emoji_events,
+                value: '${_demoProgress.unlockedAchievementsCount}',
+                label: 'Achievements',
+                color: AppColors.chartPurple,
               ),
             ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAchievements(BuildContext context) {
+    final unlockedAchievements =
+        _demoProgress.achievements.where((a) => a.isUnlocked).toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'I tuoi Achievements',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+              TextButton(
+                onPressed: () => onNavigateToTab(4), // Profile
+                child: const Text('Vedi tutti'),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 120,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: unlockedAchievements.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 16),
+            itemBuilder: (context, index) {
+              final achievement = unlockedAchievements[index];
+              return AchievementBadge(
+                icon: achievement.icon,
+                title: achievement.title,
+                tier: achievement.tier,
+                isUnlocked: true,
+                size: 70,
+              );
+            },
           ),
         ),
       ],
@@ -421,7 +575,9 @@ class _DashboardView extends StatelessWidget {
           children: [
             Text(
               'Attività Recenti',
-              style: Theme.of(context).textTheme.titleLarge,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
             ),
             TextButton(
               onPressed: () {},
@@ -429,37 +585,49 @@ class _DashboardView extends StatelessWidget {
             ),
           ],
         ),
+        const SizedBox(height: 12),
         Container(
           decoration: BoxDecoration(
             color: AppColors.surface,
-            borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-            border: Border.all(
-              color: AppColors.divider,
-              width: 1,
-            ),
+            borderRadius: BorderRadius.circular(AppTheme.radiusXL),
+            border: Border.all(color: AppColors.divider),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: Column(
             children: [
               _ActivityItem(
                 icon: Icons.check_circle,
-                title: 'Colazione completata',
-                subtitle: 'Oggi, 08:30',
-                color: AppColors.accent,
+                title: 'Workout completato',
+                subtitle: 'Oggi, 07:30 - Full Body',
+                color: AppColors.success,
               ),
               const Divider(height: 1, color: AppColors.divider),
               _ActivityItem(
-                icon: Icons.local_drink,
+                icon: Icons.local_fire_department,
+                title: 'Streak mantenuta!',
+                subtitle: 'Oggi - ${_demoProgress.currentStreak} giorni',
+                color: AppColors.primary,
+              ),
+              const Divider(height: 1, color: AppColors.divider),
+              _ActivityItem(
+                icon: Icons.emoji_events,
+                title: 'Achievement sbloccato',
+                subtitle: 'Ieri - "Una Settimana"',
+                color: AppColors.gold,
+              ),
+              const Divider(height: 1, color: AppColors.divider),
+              _ActivityItem(
+                icon: Icons.water_drop,
                 title: 'Obiettivo acqua raggiunto',
                 subtitle: 'Ieri, 18:00',
                 color: AppColors.info,
               ),
-              const Divider(height: 1, color: AppColors.divider),
-              _ActivityItem(
-                icon: Icons.event_available,
-                title: 'Appuntamento confermato',
-                subtitle: 'Ieri, 10:00',
-                color: AppColors.primary,
-              ),
             ],
           ),
         ),
@@ -468,124 +636,6 @@ class _DashboardView extends StatelessWidget {
   }
 }
 
-/// Card per azioni rapide
-class _QuickActionCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final Color color;
-  final VoidCallback onTap;
-  final bool isSquared;
-
-  const _QuickActionCard({
-    required this.icon,
-    required this.title,
-    required this.color,
-    required this.onTap,
-    this.isSquared = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final borderRadius = isSquared ? AppTheme.radiusSmall : AppTheme.radiusMedium;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(borderRadius),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(borderRadius),
-            border: Border.all(
-              color: color.withValues(alpha: 0.15),
-              width: 1,
-            ),
-          ),
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-                ),
-                child: Icon(icon, color: color, size: 26),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Indicatore di progresso
-class _ProgressIndicator extends StatelessWidget {
-  final String label;
-  final double progress;
-  final Color color;
-
-  const _ProgressIndicator({
-    required this.label,
-    required this.progress,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-              ),
-              child: Text(
-                '${(progress * 100).toInt()}%',
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: color,
-                    ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-          child: LinearProgressIndicator(
-            value: progress,
-            backgroundColor: color.withValues(alpha: 0.12),
-            valueColor: AlwaysStoppedAnimation<Color>(color),
-            minHeight: 6,
-          ),
-        ),
-      ],
-    );
-  }
-}
 
 /// Item attività recente
 class _ActivityItem extends StatelessWidget {
@@ -722,7 +772,7 @@ class _ProfileView extends ConsumerWidget {
             onTap: () {},
           ),
           const SizedBox(height: 24),
-          // Pulsante Logout - Stile Tech
+          // Pulsante Logout
           SizedBox(
             width: double.infinity,
             height: 52,

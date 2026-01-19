@@ -1,77 +1,76 @@
 import 'package:flutter/material.dart';
 
-/// Palette colori "Biohacking Tech" - Design Futuristico
-/// Per Corpo Sostenibile - Tech Company di Salute e Benessere
+/// Palette colori "Modern Fitness"
+/// Stile moderno, futuristico con glassmorphism e gamification
 class AppColors {
   AppColors._();
 
   // ═══════════════════════════════════════════════════════════════
-  //                    PRIMARY - Verde Cyber-Teal
+  //                    PRIMARY - Coral/Salmon
   // ═══════════════════════════════════════════════════════════════
-  static const Color primary = Color(0xFF00D9A6);           // Verde-Teal Elettrico
-  static const Color primaryLight = Color(0xFF33E3BC);      // Glow verde chiaro
-  static const Color primaryMedium = Color(0xFF00C897);     // Verde medio
-  static const Color primaryDark = Color(0xFF00B388);       // Verde intenso
-  static const Color primarySurface = Color(0xFF0A2922);    // Verde profondo (dark mode)
-  static const Color splashBackground = Color(0xFF143029);  // Verde scuro originale splash
+  static const Color primary = Color(0xFFFF6B6B);           // Coral principale
+  static const Color primaryLight = Color(0xFFFF8E8E);      // Coral chiaro
+  static const Color primaryMedium = Color(0xFFFA5252);     // Coral medio
+  static const Color primaryDark = Color(0xFFE64545);       // Coral scuro
+  static const Color primarySurface = Color(0xFFFFF5F5);    // Coral surface (per card)
 
   // ═══════════════════════════════════════════════════════════════
-  //                    ACCENT - Cyan Tech
+  //                    SECONDARY - Soft Teal
   // ═══════════════════════════════════════════════════════════════
-  static const Color accent = Color(0xFF00C8FF);            // Cyan Brillante
-  static const Color accentLight = Color(0xFF66DBFF);       // Cyan chiaro
-  static const Color accentDark = Color(0xFF00A3D9);        // Cyan scuro
+  static const Color secondary = Color(0xFF10B981);         // Teal morbido
+  static const Color secondaryLight = Color(0xFF34D399);    // Teal chiaro
+  static const Color secondaryDark = Color(0xFF059669);     // Teal scuro
 
   // ═══════════════════════════════════════════════════════════════
-  //                    SECONDARY - Viola Futuristico
+  //                    ACCENT - Warm Orange
   // ═══════════════════════════════════════════════════════════════
-  static const Color secondary = Color(0xFF8B5CF6);         // Deep Violet
-  static const Color secondaryLight = Color(0xFFA78BFA);    // Viola chiaro
-  static const Color secondaryDark = Color(0xFF7C3AED);     // Viola intenso
+  static const Color accent = Color(0xFFF97316);            // Arancione caldo
+  static const Color accentLight = Color(0xFFFB923C);       // Arancione chiaro
+  static const Color accentDark = Color(0xFFEA580C);        // Arancione scuro
 
   // ═══════════════════════════════════════════════════════════════
-  //                    NEON COLORS - Per grafici e highlights
+  //                    SUPERFICI E SFONDI
   // ═══════════════════════════════════════════════════════════════
-  static const Color neonOrange = Color(0xFFFF6B35);        // Arancione Neon acceso
-  static const Color neonPink = Color(0xFFFF2D92);          // Rosa Neon
-  static const Color neonPurple = Color(0xFFBF5AF2);        // Viola Neon
-  static const Color neonBlue = Color(0xFF00D4FF);          // Blu Neon
-  static const Color neonYellow = Color(0xFFFFE135);        // Giallo Neon
-  static const Color neonRed = Color(0xFFFF3B5C);           // Rosso Neon
-
-  // ═══════════════════════════════════════════════════════════════
-  //                    LIGHT MODE - Superfici e Sfondi
-  // ═══════════════════════════════════════════════════════════════
-  static const Color background = Color(0xFFF8FAFB);        // Bianco-grigio freddo
+  static const Color background = Color(0xFFFAFAF9);        // Bianco caldo
   static const Color surface = Color(0xFFFFFFFF);           // Bianco puro
-  static const Color surfaceVariant = Color(0xFFF0F3F5);    // Grigio chiarissimo
+  static const Color surfaceVariant = Color(0xFFF5F5F4);    // Grigio caldo chiaro
   static const Color surfaceElevated = Color(0xFFFFFFFF);   // Superficie elevata
 
   // ═══════════════════════════════════════════════════════════════
-  //                    LIGHT MODE - Testi
+  //                    TESTI
   // ═══════════════════════════════════════════════════════════════
-  static const Color textPrimary = Color(0xFF0F172A);       // Blu-nero profondo
-  static const Color textSecondary = Color(0xFF64748B);     // Grigio ardesia
-  static const Color textHint = Color(0xFF94A3B8);          // Grigio hint
+  static const Color textPrimary = Color(0xFF1F2937);       // Grigio scuro caldo
+  static const Color textSecondary = Color(0xFF6B7280);     // Grigio medio
+  static const Color textHint = Color(0xFF9CA3AF);          // Grigio chiaro
   static const Color textOnPrimary = Color(0xFFFFFFFF);     // Bianco su primary
   static const Color textOnSecondary = Color(0xFFFFFFFF);   // Bianco su secondary
 
   // ═══════════════════════════════════════════════════════════════
-  //                    LIGHT MODE - Divisori e Bordi
+  //                    DIVISORI E BORDI
   // ═══════════════════════════════════════════════════════════════
-  static const Color divider = Color(0xFFE2E8F0);           // Divisore chiaro
-  static const Color border = Color(0xFFCBD5E1);            // Bordo grigio
+  static const Color divider = Color(0xFFE5E7EB);           // Divisore grigio
+  static const Color border = Color(0xFFD1D5DB);            // Bordo grigio
 
   // ═══════════════════════════════════════════════════════════════
-  //                    STATI - Colori accesi tech
+  //                    STATI
   // ═══════════════════════════════════════════════════════════════
-  static const Color success = Color(0xFF00FF88);           // Verde Neon
-  static const Color warning = Color(0xFFFF6B35);           // Arancione Neon (più acceso!)
-  static const Color error = Color(0xFFFF3B5C);             // Rosso Neon
-  static const Color info = Color(0xFF00D4FF);              // Blu Neon
+  static const Color success = Color(0xFF10B981);           // Verde successo
+  static const Color warning = Color(0xFFF59E0B);           // Ambra warning
+  static const Color error = Color(0xFFEF4444);             // Rosso errore
+  static const Color info = Color(0xFF3B82F6);              // Blu info
 
   // ═══════════════════════════════════════════════════════════════
-  //                    GRADIENTI TECH (per uso in widget)
+  //                    COLORI GRAFICI E CATEGORIE
+  // ═══════════════════════════════════════════════════════════════
+  static const Color chartPink = Color(0xFFEC4899);         // Rosa per grafici
+  static const Color chartPurple = Color(0xFF8B5CF6);       // Viola per grafici
+  static const Color chartBlue = Color(0xFF3B82F6);         // Blu per grafici
+  static const Color chartTeal = Color(0xFF14B8A6);         // Teal per grafici
+  static const Color chartOrange = Color(0xFFF97316);       // Arancione per grafici
+  static const Color chartYellow = Color(0xFFEAB308);       // Giallo per grafici
+
+  // ═══════════════════════════════════════════════════════════════
+  //                    GRADIENTI
   // ═══════════════════════════════════════════════════════════════
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [primary, accent],
@@ -85,21 +84,64 @@ class AppColors {
     end: Alignment.bottomCenter,
   );
 
-  static const LinearGradient accentGradient = LinearGradient(
-    colors: [accent, secondary],
+  static const LinearGradient warmGradient = LinearGradient(
+    colors: [Color(0xFFFF6B6B), Color(0xFFF97316)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  static const LinearGradient neonGradient = LinearGradient(
-    colors: [neonPink, neonPurple, neonBlue],
+  static const LinearGradient freshGradient = LinearGradient(
+    colors: [secondary, Color(0xFF14B8A6)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  static const LinearGradient warmNeonGradient = LinearGradient(
-    colors: [neonOrange, neonPink],
+  static const LinearGradient softGradient = LinearGradient(
+    colors: [Color(0xFFFFF5F5), Color(0xFFFAFAF9)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
+
+  static const LinearGradient premiumGradient = LinearGradient(
+    colors: [Color(0xFF8B5CF6), Color(0xFFEC4899)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
+
+  static const LinearGradient darkGradient = LinearGradient(
+    colors: [Color(0xFF1F2937), Color(0xFF374151)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient successGradient = LinearGradient(
+    colors: [secondary, Color(0xFF14B8A6)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // ═══════════════════════════════════════════════════════════════
+  //                    GLASSMORPHISM
+  // ═══════════════════════════════════════════════════════════════
+  static Color get glassWhite => Colors.white.withValues(alpha: 0.15);
+  static Color get glassWhiteLight => Colors.white.withValues(alpha: 0.25);
+  static Color get glassBorder => Colors.white.withValues(alpha: 0.2);
+  static Color get glassShadow => Colors.black.withValues(alpha: 0.1);
+  static Color get glassOverlay => Colors.black.withValues(alpha: 0.3);
+
+  // ═══════════════════════════════════════════════════════════════
+  //                    ACHIEVEMENT TIERS
+  // ═══════════════════════════════════════════════════════════════
+  static const Color bronze = Color(0xFFCD7F32);
+  static const Color silver = Color(0xFFC0C0C0);
+  static const Color gold = Color(0xFFFFD700);
+  static const Color platinum = Color(0xFFE5E4E2);
+
+  // ═══════════════════════════════════════════════════════════════
+  //                    RING PROGRESS COLORS
+  // ═══════════════════════════════════════════════════════════════
+  static const Color ringCalories = Color(0xFFFF6B6B);  // Coral
+  static const Color ringActivity = Color(0xFF10B981);  // Teal
+  static const Color ringWater = Color(0xFF3B82F6);     // Blue
+  static const Color ringSleep = Color(0xFF8B5CF6);     // Purple
 }
